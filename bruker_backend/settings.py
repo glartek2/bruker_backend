@@ -81,13 +81,13 @@ WSGI_APPLICATION = "bruker_backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME", default="postgresdatabase"),
-        "USER": env("DB_USER", default="user"),
-        "PASSWORD": env("DB_PASSWORD", default="user1234"),
+        "NAME": env("DB_NAME", default="bruker_db"),
+        "USER": env("DB_USER", default="bruker"),
+        "PASSWORD": env("DB_PASSWORD", default="bruker"),
         "HOST": env("DB_HOST", default="localhost"),
         "PORT": env.int("DB_PORT", default=5432),
         "TEST": {
-            "NAME": env("DB_TEST_NAME", default="postgrestestdatabase"),
+            "NAME": env("DB_TEST_NAME", default="bruker_db_test"),
         },
     }
 }
