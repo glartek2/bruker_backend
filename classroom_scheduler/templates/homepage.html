@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Bruker application{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body text-center">
+        <h1 class="card-title">Welcome to the Home Page</h1>
+
+        {% if user.is_authenticated %}
+          <p class="lead">Hello, {{ user.username }}!</p>
+          <a href="{% url 'users:logout' %}" class="btn btn-outline-secondary">Logout</a>
+        {% else %}
+          <p class="lead">
+            Please <a href="{% url 'users:login' %}">Login</a> or
+            <a href="{% url 'users:register' %}">Register</a> to continue.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if messages %}
+      <div class="mb-3">
+        {% for msg in messages %}
+          <div class="alert alert-{{ msg.tags }}" role="alert">
+            {{ msg|safe }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock content %}
