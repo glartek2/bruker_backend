@@ -1,16 +1,17 @@
+import json
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import login, logout, authenticate, get_user_model
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage
-from django.utils.safestring import mark_safe
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.views.decorators.http import require_POST
+
 from .forms import UserRegistrationForm, UserLoginForm
 from .decorators import user_not_authenticated
 from .tokens import account_activation_token
@@ -25,19 +26,22 @@ def activate(request, uidb64, token):
         user = User.objects.get(pk=uid)
 
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+        return JsonResponse({"success": False, "message": "Invalid activation link"}, status=400)
 
-    if user and account_activation_token.check_token(user, token):
+    if account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
 
-        messages.success(request, "Thank you for your email confirmation.Now you can login to your account.")
-        return redirect('users:login')
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Thank you for your email confirmation.Now you can login to your account."
+            }
+
+        )
 
     else:
-        messages.error(request, "Activation link invalid.")
-
-    return redirect('home_module:home page')
+        return JsonResponse({"success": False, "message": "Invalid activation link"}, status=400)
 
 
 def activate_email(request, user, to_email):
@@ -53,16 +57,10 @@ def activate_email(request, user, to_email):
 
     email = EmailMessage(mail_subject, message, to=[to_email])
 
-    if email.send():
-        messages.success(
-            request,
-            mark_safe(f'Dear <b>{user}</b>, please go to your email <b>{to_email}</b> inbox and click on \
-                      the received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
-        )
-    else:
-        messages.error(request, f'Problem sending email to {to_email}, check if you typed it correctly.')
+    return email.send()
 
 
+@require_POST
 def reset_password(request, uidb64, token):
     User = get_user_model()
 
@@ -70,44 +68,41 @@ def reset_password(request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
+        return JsonResponse({"success": False, "message": "Invalid user"}, status=400)
 
-    if user and default_token_generator.check_token(user, token):
-        if request.method == 'POST':
-            form = SetPasswordForm(user, request.POST)
+    if not default_token_generator.check_token(user, token):
+        return JsonResponse({"success": False, "message": "Invalid or expired token"}, status=400)
 
-            if form.is_valid():
-                form.save()
-                messages.success(request,
-                                 "Your password was successfully reset.Now you can log in to your account.")
-                return redirect('users:login')
-        else:
-            form = SetPasswordForm(user)
-            return render(request, 'user/password_reset_confirm.html', {'form': form})
-    else:
-        messages.error(request, "Activation link invalid or expired.")
-        return redirect('home_module:home_page')
+    data = json.loads(request.body)
+    form = SetPasswordForm(user, data)
+
+    if form.is_valid():
+        form.save()
+        return JsonResponse(
+            {"success": True, "message": "Your password was successfully reset.Now you can log in to your account."}
+        )
+    return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
+@require_POST
 def password_reset_request(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
+    data = json.loads(request.body)
+    form = PasswordResetForm(data)
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=email)
+            if reset_password_email(request, user, email):
+                return JsonResponse(
+                    {"success": True, "message": "We send you an email with password reset instruction."})
+            else:
+                return JsonResponse({"success": False, "message": "Error sending email"}, status=500)
+        except ObjectDoesNotExist:
 
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            User = get_user_model()
-            try:
-                user = User.objects.get(email=email)
-                reset_password_email(request, user, email)
-                messages.success(request, 'We send you an email with password reset instruction.')
-                return redirect('users:login')
-            except ObjectDoesNotExist:
-                messages.error(request, 'User with given email not found.')
+            return JsonResponse({"success": False, "message": "User with given email not found."}, status=404)
 
-    else:
-        form = PasswordResetForm()
-
-    return render(request, 'user/password_reset_form.html', {'form': form})
+    return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
 def reset_password_email(request, user, to_email):
@@ -121,88 +116,78 @@ def reset_password_email(request, user, to_email):
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
 
-    if email.send():
-        messages.success(
-            request,
-            mark_safe(
-                f'Dear <b>{user}</b>,please go to your email<b>{to_email}</b>inbox and click on \
-                      the received link to confirm password reset. <b>Note:</b> Check your spam folder.')
-        )
-    else:
-        messages.error(request, f'Problem sending email to {to_email}, check if you typed it correctly.')
+    return email.send()
 
 
 @user_not_authenticated
+@require_POST
 def register(request):
-    if request.method == 'POST':
+    data = json.loads(request.body)
+    form = UserRegistrationForm(data)
 
-        form = UserRegistrationForm(request.POST)
+    if form.is_valid():
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+        email_sent = activate_email(request, user, form.cleaned_data['email'])
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Registration successful. Activation email sent." if email_sent
+                else "User created, but email failed."
+            })
 
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-            activate_email(request, user, form.cleaned_data['email'])
-            return redirect('home_module:home page')
-
-        else:
-            for error in list(form.errors.values()):
-                messages.error(request, error)
-
-    else:
-        form = UserRegistrationForm()
-
-    return render(request, template_name="user/register.html", context={'form': form})
+    return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
 @login_required
+@require_POST
 def custom_logout(request):
     logout(request)
-    messages.info(request, "Logged out successfully")
-
-    return redirect('home_module:home page')
+    return JsonResponse({"success": True, "message": "Logged out successfully."})
 
 
-@user_not_authenticated
+@require_POST
 def custom_login(request):
-    max_attempts = 3
-
-    if request.method != "POST":
-        request.session['failed_login_attempts'] = 0
+    MAX_ATTEMPTS = 3
 
     attempts = request.session.get('failed_login_attempts', 0)
 
-    if request.method == "POST":
-        form = UserLoginForm(request=request, data=request.POST)
+    data = json.loads(request.body)
+    form = UserLoginForm(request=request, data=data)
 
-        if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
+    if form.is_valid():
+        user = authenticate(
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password']
+        )
+        if user:
+            request.session['failed_login_attempts'] = 0
+            login(request, user)
+            return JsonResponse({
+                "success": True,
+                "message": f"Hello {user.username}, you are now logged in.",
+            })
 
-            if user:
-                request.session['failed_login_attempts'] = 0
-                login(request, user)
-                messages.success(request, mark_safe(f"Hello <b>{user.username}</b>! You have been logged in"))
-                return redirect('home_module:home page')
+    attempts += 1
+    request.session['failed_login_attempts'] = attempts
 
-        else:
-            attempts += 1
-            request.session['failed_login_attempts'] = attempts
+    if attempts >= MAX_ATTEMPTS:
+        reset_url = request.build_absolute_uri(reverse('users:password_reset'))
 
-            if attempts >= max_attempts:
-                reset_password_url = reverse('users:password_reset')
+        return JsonResponse({
+            "success": False,
+            "message": (
+                "Too many failed attempts. "
+                f"Please reset your password: {reset_url}"
+            ),
+            "attempts": attempts,
+            "blocked": True
+        }, status=429)
 
-                msg = mark_safe(
-                    "Wrong password entered 3 times."
-                    f"<a href=\"{reset_password_url}\">Reset password</a>"
-                )
-                messages.warning(request, msg)
-            else:
-
-                messages.error(request, "Incorrect username or password")
-
-    form = UserLoginForm()
-
-    return render(request=request, template_name='user/login.html', context={'form': form})
+    return JsonResponse({
+        "success": False,
+        "message": "Incorrect username or password.",
+        "attempts": attempts,
+        "remaining": MAX_ATTEMPTS - attempts
+    }, status=400)
