@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 MAX_RETRIES=20
 RETRY_INTERVAL=2
