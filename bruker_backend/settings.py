@@ -30,11 +30,8 @@ SECRET_KEY = "django-insecure-b7-ah^t&j)jrwd%r0+m*(s@%!mggxz7rc#95!3t6u!m5qo!95@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
-# Authorization
-LOGIN_URL = None
-LOGOUT_REDIRECT_URL = None
 
 # Application definition
 
@@ -49,28 +46,36 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "crispy_forms",
     "crispy_bootstrap5",
-    "corsheaders",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular"
 ]
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "bruker-backend API",
+    "DESCRIPTION": "no description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Vite
-    "http://127.0.0.1:5173",
 ]
 
 ROOT_URLCONF = "bruker_backend.urls"

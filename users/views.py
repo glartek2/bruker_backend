@@ -11,7 +11,13 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import EmailMessage
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.views.decorators.http import require_POST
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from drf_spectacular.utils import extend_schema
 
+from .serializers import RegisterSerializer, LoginSerializer, TokenResponseSerializer
 from .forms import UserRegistrationForm, UserLoginForm
 from .decorators import user_not_authenticated
 from .tokens import account_activation_token
@@ -35,7 +41,7 @@ def activate(request, uidb64, token):
         return JsonResponse(
             {
                 "success": True,
-                "message": "Thank you for your email confirmation. Now you can login to your account."
+                "message": "Thank you for your email confirmation.Now you can login to your account."
             }
 
         )
@@ -79,7 +85,7 @@ def reset_password(request, uidb64, token):
     if form.is_valid():
         form.save()
         return JsonResponse(
-            {"success": True, "message": "Your password was successfully reset. Now you can log in to your account."}
+            {"success": True, "message": "Your password was successfully reset.Now you can log in to your account."}
         )
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
@@ -140,48 +146,41 @@ def register(request):
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
+@login_required
 @require_POST
 def custom_logout(request):
-    if request.user.is_authenticated:
-        logout(request)
-        return JsonResponse({'success': True, 'message': 'Logged out'})
-    return JsonResponse({'success': False, 'message': 'Not logged in'}, status=401)
+    logout(request)
+    return JsonResponse({"success": True, "message": "Logged out successfully."})
 
 
 @require_POST
 def custom_login(request):
     MAX_ATTEMPTS = 3
+
     attempts = request.session.get('failed_login_attempts', 0)
 
     data = json.loads(request.body)
     form = UserLoginForm(request=request, data=data)
 
     if form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-
-        User = get_user_model()
-        try:
-            user = User.objects.get(email=username)
-        except User.DoesNotExist:
-            user = None
-
+        user = authenticate(
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password']
+        )
         if user:
-            user = authenticate(request, username=user.username, password=password)
-            if user:
-                request.session['failed_login_attempts'] = 0
-                login(request, user)
-                return JsonResponse({
-                    "success": True,
-                    "message": f"Hello {user.username}, you are now logged in.",
-                    "data": user.to_dict(),
-                })
+            request.session['failed_login_attempts'] = 0
+            login(request, user)
+            return JsonResponse({
+                "success": True,
+                "message": f"Hello {user.username}, you are now logged in.",
+            })
 
     attempts += 1
     request.session['failed_login_attempts'] = attempts
 
     if attempts >= MAX_ATTEMPTS:
         reset_url = request.build_absolute_uri(reverse('users:password_reset'))
+
         return JsonResponse({
             "success": False,
             "message": (
@@ -194,7 +193,40 @@ def custom_login(request):
 
     return JsonResponse({
         "success": False,
-        "message": "Incorrect email or password.",
+        "message": "Incorrect username or password.",
         "attempts": attempts,
         "remaining": MAX_ATTEMPTS - attempts
     }, status=400)
+
+
+class RegisterView(APIView):
+    @extend_schema(
+        request=RegisterSerializer,
+        responses={201: TokenResponseSerializer},
+        description="Register a new user"
+    )
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token = Token.objects.get(user=user)
+            return Response({'token': token.key}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(APIView):
+    @extend_schema(
+        request=LoginSerializer,
+        responses={200: TokenResponseSerializer},
+        description="Log in with username and password"
+    )
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(username=serializer.validated_data['username'],
+                                password=serializer.validated_data['password'])
+            if user:
+                token, _ = Token.objects.get_or_create(user=user)
+                return Response({'token': token.key})
+            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
