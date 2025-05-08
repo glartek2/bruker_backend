@@ -35,7 +35,7 @@ def activate(request, uidb64, token):
         return JsonResponse(
             {
                 "success": True,
-                "message": "Thank you for your email confirmation.Now you can login to your account."
+                "message": "Thank you for your email confirmation. Now you can login to your account."
             }
 
         )
@@ -79,7 +79,7 @@ def reset_password(request, uidb64, token):
     if form.is_valid():
         form.save()
         return JsonResponse(
-            {"success": True, "message": "Your password was successfully reset.Now you can log in to your account."}
+            {"success": True, "message": "Your password was successfully reset. Now you can log in to your account."}
         )
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
@@ -140,41 +140,48 @@ def register(request):
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
-@login_required
 @require_POST
 def custom_logout(request):
-    logout(request)
-    return JsonResponse({"success": True, "message": "Logged out successfully."})
+    if request.user.is_authenticated:
+        logout(request)
+        return JsonResponse({'success': True, 'message': 'Logged out'})
+    return JsonResponse({'success': False, 'message': 'Not logged in'}, status=401)
 
 
 @require_POST
 def custom_login(request):
     MAX_ATTEMPTS = 3
-
     attempts = request.session.get('failed_login_attempts', 0)
 
     data = json.loads(request.body)
     form = UserLoginForm(request=request, data=data)
 
     if form.is_valid():
-        user = authenticate(
-            username=form.cleaned_data['username'],
-            password=form.cleaned_data['password']
-        )
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=username)
+        except User.DoesNotExist:
+            user = None
+
         if user:
-            request.session['failed_login_attempts'] = 0
-            login(request, user)
-            return JsonResponse({
-                "success": True,
-                "message": f"Hello {user.username}, you are now logged in.",
-            })
+            user = authenticate(request, username=user.username, password=password)
+            if user:
+                request.session['failed_login_attempts'] = 0
+                login(request, user)
+                return JsonResponse({
+                    "success": True,
+                    "message": f"Hello {user.username}, you are now logged in.",
+                    "data": user.to_dict(),
+                })
 
     attempts += 1
     request.session['failed_login_attempts'] = attempts
 
     if attempts >= MAX_ATTEMPTS:
         reset_url = request.build_absolute_uri(reverse('users:password_reset'))
-
         return JsonResponse({
             "success": False,
             "message": (
@@ -187,7 +194,7 @@ def custom_login(request):
 
     return JsonResponse({
         "success": False,
-        "message": "Incorrect username or password.",
+        "message": "Incorrect email or password.",
         "attempts": attempts,
         "remaining": MAX_ATTEMPTS - attempts
     }, status=400)

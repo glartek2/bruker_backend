@@ -32,6 +32,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# Authorization
+LOGIN_URL = None
+LOGOUT_REDIRECT_URL = None
 
 # Application definition
 
@@ -45,7 +48,8 @@ INSTALLED_APPS = [
     "classroom_scheduler.apps.ClassroomSchedulerConfig",
     "users.apps.UsersConfig",
     "crispy_forms",
-    'crispy_bootstrap5',
+    "crispy_bootstrap5",
+    "corsheaders",
 ]
 
 
@@ -53,13 +57,20 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Vite
+    "http://127.0.0.1:5173",
 ]
 
 ROOT_URLCONF = "bruker_backend.urls"
