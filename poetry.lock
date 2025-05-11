@@ -76,6 +76,22 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-cors-headers"
+version = "4.7.0"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "django_cors_headers-4.7.0-py3-none-any.whl", hash = "sha256:f1c125dcd58479fe7a67fe2499c16ee38b81b397463cf025f0e2c42937421070"},
+    {file = "django_cors_headers-4.7.0.tar.gz", hash = "sha256:6fdf31bf9c6d6448ba09ef57157db2268d515d94fc5c89a0a1028e1fc03ee52b"},
+]
+
+[package.dependencies]
+asgiref = ">=3.6"
+django = ">=4.2"
+
+[[package]]
 name = "django-crispy-forms"
 version = "2.4"
 description = "Best way to have Django DRY forms"
@@ -569,4 +585,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4"
-content-hash = "1822b7fa6ba965699552bc5efab9f401405c6ea51df19d575e70134c0d95666d"
+content-hash = "777fac76224852dd2f1864f2d5bf4fd79a749eaa25b526667b6526908bc3c3f2"
