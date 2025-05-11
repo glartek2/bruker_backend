@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Building, Equipment, Room
-
+from .models import Building, Equipment, Room, Reservation, Reservation_info
+from users.serializers import CustomUserSerializer
+from users.models import CustomUser
 
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -90,3 +91,63 @@ class RoomSerializer(serializers.ModelSerializer):
         )
 
         return room
+
+class ReservationInfoSerializer(serializers.ModelSerializer):
+    user = CustomUserSerializer(read_only = True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        source = 'user',
+        write_only = True
+    )
+
+    class Meta:
+        model = Reservation_info
+        fields = ['id', 'user', 'user_id', 'description']
+
+class ReservationSerializer(serializers.ModelSerializer):
+    room = RoomSerializer(read_only = True)
+    reservation_info = ReservationInfoSerializer(read_only = True)
+
+    room_id = serializers.PrimaryKeyRelatedField(
+        queryset=Room.objects.all(),
+        source='room',
+        write_only = True
+    )
+    reservation_info_id = serializers.PrimaryKeyRelatedField(
+        queryset=Reservation_info.objects.all(),
+        source='reservation_info',
+        write_only=True
+    )
+
+    reservation_info_data = ReservationInfoSerializer(
+        source='reservation_info',
+        write_only=True,
+        required=False
+    )
+
+    class Meta:
+        model = Reservation
+        fields = [
+            'id', 'room', 'room_id', 'reservation_info',
+            'reservation_info_id', 'reservation_info_data', 'date_time'
+        ]
+
+    def create(self, validated_data):
+        reservation_info= validated_data.pop('reservation_info', None)
+        room_obj = validated_data.pop('room')
+
+        if isinstance(reservation_info, dict):
+            user_data = reservation_info.pop('user')
+            user_obj = CustomUser.objects.get(id=user_data['id'])
+            reservation_info, _ = Reservation_info.objects.get_or_create(
+                user=user_obj,
+                defaults=reservation_info
+            )
+
+        reservation = Reservation.objects.create(
+            room = room_obj,
+            reservation_info = reservation_info,
+            **validated_data
+        )
+
+        return reservation

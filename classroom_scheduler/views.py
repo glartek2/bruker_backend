@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Building, Room, Equipment
-from .serializers import BuildingSerializer, RoomSerializer, EquipmentSerializer
+from .models import Building, Room, Equipment, Reservation, Reservation_info
+from .serializers import BuildingSerializer, RoomSerializer, EquipmentSerializer, ReservationInfoSerializer, ReservationSerializer
 from .filters import DynamicJsonFilterBackend
 from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -38,3 +38,11 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     search_fields = ['room_number', 'building__name']
     ordering_fields = ['capacity', 'room_number', 'building__name']
+
+class ReservationInfoViewSet(viewsets.ModelViewSet):
+    queryset = Reservation_info.objects.all()
+    serializer_class = ReservationInfoSerializer
+
+class ReservationViewSet(viewsets.ModelViewSet):
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
