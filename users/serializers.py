@@ -25,6 +25,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({'password': "Hasła nie są zgodne"})
 
+        return attrs
+
     def create(self, validated_data):
         user = CustomUser.objects.create_user(
             username=validated_data['username'],
@@ -53,12 +55,14 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
 
 class ResetPasswordConfirmSerializer(serializers.Serializer):
 
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    new_password2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Hasła muszą być identyczne"})
+        if attrs['new_password'] != attrs['new_password2']:
+            raise serializers.ValidationError({"new_password": "Hasła muszą być identyczne"})
+
+        return attrs
 
 
 class MessageSerializer(serializers.Serializer):

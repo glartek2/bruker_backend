@@ -122,6 +122,15 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+
+            send_email(
+                request,
+                user,
+                mail_subject="Activate your account",
+                token_generator=account_activation_token,
+                template_name='template_activate_account.html',
+                to_email=user.email
+            )
             token = Token.objects.get(user=user)
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
