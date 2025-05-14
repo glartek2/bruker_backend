@@ -2,6 +2,7 @@ from django.db import models
 
 from users.models import CustomUser
 
+
 # Create your models here.
 class Building(models.Model):
     name = models.CharField(max_length=200)
@@ -28,17 +29,19 @@ class Room(models.Model):
 
     def __str__(self):
         return f"Room {self.room_number} in {self.building.name}"
-    
-class Reservation_info(models.Model):
+
+
+class ReservationInfo(models.Model):
     user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     description = models.TextField()
 
     def __str__(self):
         return f"Reservation for: {self.user_id}.\nDescription: {self.description}"
 
+
 class Reservation(models.Model):
     room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
-    reservation_info_id = models.ForeignKey(Reservation_info, on_delete=models.CASCADE)
+    reservation_info_id = models.ForeignKey(ReservationInfo, on_delete=models.CASCADE)
 
     date_time = models.DateTimeField()
 

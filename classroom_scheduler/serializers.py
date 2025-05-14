@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import Building, Equipment, Room, Reservation, Reservation_info
+from .models import Building, Equipment, Room, Reservation, ReservationInfo
 from users.serializers import CustomUserSerializer
 from users.models import CustomUser
+
 
 class BuildingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -92,29 +93,31 @@ class RoomSerializer(serializers.ModelSerializer):
 
         return room
 
+
 class ReservationInfoSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer(read_only = True)
+    user = CustomUserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
         queryset=CustomUser.objects.all(),
-        source = 'user',
-        write_only = True
+        source='user',
+        write_only=True
     )
 
     class Meta:
-        model = Reservation_info
+        model = ReservationInfo
         fields = ['id', 'user', 'user_id', 'description']
 
+
 class ReservationSerializer(serializers.ModelSerializer):
-    room = RoomSerializer(read_only = True)
-    reservation_info = ReservationInfoSerializer(read_only = True)
+    room = RoomSerializer(read_only=True)
+    reservation_info = ReservationInfoSerializer(read_only=True)
 
     room_id = serializers.PrimaryKeyRelatedField(
         queryset=Room.objects.all(),
         source='room',
-        write_only = True
+        write_only=True
     )
     reservation_info_id = serializers.PrimaryKeyRelatedField(
-        queryset=Reservation_info.objects.all(),
+        queryset=ReservationInfo.objects.all(),
         source='reservation_info',
         write_only=True
     )
@@ -133,20 +136,20 @@ class ReservationSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        reservation_info= validated_data.pop('reservation_info', None)
+        reservation_info = validated_data.pop('reservation_info', None)
         room_obj = validated_data.pop('room')
 
         if isinstance(reservation_info, dict):
             user_data = reservation_info.pop('user')
             user_obj = CustomUser.objects.get(id=user_data['id'])
-            reservation_info, _ = Reservation_info.objects.get_or_create(
+            reservation_info, _ = ReservationInfo.objects.get_or_create(
                 user=user_obj,
                 defaults=reservation_info
             )
 
         reservation = Reservation.objects.create(
-            room = room_obj,
-            reservation_info = reservation_info,
+            room=room_obj,
+            reservation_info=reservation_info,
             **validated_data
         )
 
