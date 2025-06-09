@@ -3,5 +3,8 @@ Hi {{ user.username }},
 
 Please click on the link below to confirm your registration:
 
-{{ protocol }}://{{ domain }}{% url 'users:activate' uidb64=uid token=token %}
+<a href="{{ protocol }}://{{ domain }}/activate/{{ uid }}/{{ token }}/">
+    {{ protocol }}://{{ domain }}/activate/{{ uid }}/{{ token }}/
+</a>
+
 {% endautoescape %}
