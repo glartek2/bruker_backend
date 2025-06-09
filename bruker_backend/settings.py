@@ -18,7 +18,7 @@ import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-env_path = os.path.join(BASE_DIR, ".env")
+env_path = os.path.join(BASE_DIR, ".env.local")
 environ.Env.read_env(env_path)
 
 # Quick-start development settings - unsuitable for production
@@ -30,11 +30,8 @@ SECRET_KEY = "django-insecure-b7-ah^t&j)jrwd%r0+m*(s@%!mggxz7rc#95!3t6u!m5qo!95@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
-# Authorization
-LOGIN_URL = None
-LOGOUT_REDIRECT_URL = None
 
 # Application definition
 
@@ -50,15 +47,39 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "corsheaders",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_spectacular",
+    "django_extensions",
 ]
 
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter',
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "bruker-backend API",
+    "DESCRIPTION": "no description",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
+
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
