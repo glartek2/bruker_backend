@@ -92,8 +92,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite
     "http://127.0.0.1:5173",
-    "http://138.68.91.169",
-    "http://138.68.91.169:5173",
+    # "http://138.68.91.169",
+    # "http://138.68.91.169:5173",
 ]
 
 ROOT_URLCONF = "bruker_backend.urls"
