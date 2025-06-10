@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.utils.dateparse import parse_datetime
 
 
@@ -45,6 +46,26 @@ class RoomViewSet(viewsets.ModelViewSet):
     search_fields = ['room_number', 'building__name']
     ordering_fields = ['capacity', 'room_number', 'building__name']
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='start',
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Start datetime in ISO 8601 format.'
+            ),
+            OpenApiParameter(
+                name='end',
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='End datetime in ISO 8601 format.'
+            ),
+        ],
+        responses={200: RoomSerializer(many=True)},
+        description='Get rooms available between the given start and end time.'
+    )
     @action(detail=False, methods=['get'])
     def available(self, request):
         start_time = request.query_params.get('start')
