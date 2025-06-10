@@ -6,6 +6,9 @@ from .serializers import BuildingSerializer, RoomSerializer, EquipmentSerializer
 from .filters import DynamicJsonFilterBackend
 from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils.dateparse import parse_datetime
 
 
 def home(request):
@@ -18,6 +21,8 @@ class BuildingViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     ordering_fields = ['name', 'address', 'department']
     search_fields = ['name', 'address', 'department', 'description']
+
+
 
 
 class EquipmentViewSet(viewsets.ModelViewSet):
@@ -39,6 +44,33 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     search_fields = ['room_number', 'building__name']
     ordering_fields = ['capacity', 'room_number', 'building__name']
+
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+        start_time = request.query_params.get('start')
+        end_time = request.query_params.get('end')
+
+        if not start_time or not end_time:
+            return Response({'error': 'Enter start and end params (ISO 8601).'}, status=400)
+
+        start_dt = parse_datetime(start_time)
+        end_dt = parse_datetime(end_time)
+
+        if not start_dt or not end_dt:
+            return Response({'error': 'Incorrect date format. Use ISO 8601.'}, status=400)
+
+        overlapping_reservations = Reservation.objects.filter(
+            date_time__gte=start_dt,
+            date_time__lt=end_dt
+        ).values_list('room_id', flat=True)
+
+        available_rooms = Room.objects.exclude(id__in=overlapping_reservations)
+
+        dynamic_filter = DynamicJsonFilterBackend()
+        available_rooms = dynamic_filter.filter_queryset(request, available_rooms, self)
+
+        serializer = self.get_serializer(available_rooms, many=True)
+        return Response(serializer.data)
 
 
 class ReservationInfoViewSet(viewsets.ModelViewSet):
