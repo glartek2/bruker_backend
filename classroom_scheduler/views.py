@@ -66,6 +66,9 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         available_rooms = Room.objects.exclude(id__in=overlapping_reservations)
 
+        django_filter = DjangoFilterBackend()
+        available_rooms = django_filter.filter_queryset(request, available_rooms, self)
+
         dynamic_filter = DynamicJsonFilterBackend()
         available_rooms = dynamic_filter.filter_queryset(request, available_rooms, self)
 
