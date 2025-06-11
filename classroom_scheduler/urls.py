@@ -12,5 +12,10 @@ router.register('reservation-info', views.ReservationInfoViewSet)
 router.register('reservation', views.ReservationViewSet)
 urlpatterns = [
     path('', views.home, name='home page'),
+    path(
+        'reservation_update_confirmation/<uidb64>/<token>/',
+        views.ReservationUpdateConfirmationView.as_view(),
+        name='reservation_update_confirmation'
+    ),
     path('api/', include(router.urls))
 ]

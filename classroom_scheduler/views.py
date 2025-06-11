@@ -1,15 +1,22 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpResponse
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
+
 from .models import Building, Room, Equipment, Reservation, ReservationInfo
 from .serializers import BuildingSerializer, RoomSerializer, EquipmentSerializer, ReservationInfoSerializer, \
     ReservationSerializer
 from .filters import DynamicJsonFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.utils.dateparse import parse_datetime
+from users.views import send_email
 
 
 def home(request):
@@ -22,8 +29,6 @@ class BuildingViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     ordering_fields = ['name', 'address', 'department']
     search_fields = ['name', 'address', 'department', 'description']
-
-
 
 
 class EquipmentViewSet(viewsets.ModelViewSet):
@@ -105,3 +110,96 @@ class ReservationInfoViewSet(viewsets.ModelViewSet):
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+
+    @extend_schema(
+        request=ReservationSerializer,
+        responses={
+            200: OpenApiResponse(description="Reservation updated successfully."),
+            202: OpenApiResponse(description="Confirmation email sent to reservation owner."),
+            403: OpenApiResponse(description="You do not have permission to modify this reservation."),
+            400: OpenApiResponse(description="Validation failed.")
+        },
+        description="Update reservation. Staff can update immediately.Class representatives trigger email confirmation."
+    )
+    def update(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        serializer = self.get_serializer(reservation, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+
+        if user.is_staff:
+            serializer.save()
+            return Response({"detail": "Reservation updated successfully."}, status=status.HTTP_200_OK)
+
+        reservation_info = reservation.reservation_info
+
+        if reservation_info.class_representatives.filter(id=user.id).exists():
+            reservation_owner_email = reservation_info.user.email
+            new_date_time = serializer.validated_data.get('date_time')
+            reservation.proposed_date_time = new_date_time
+            reservation.save()
+
+            extra_context = {
+                'requesting_user': user,
+                'reservation': reservation,
+                'new_date_time': new_date_time,
+            }
+
+            send_email(
+                request=request,
+                user=reservation_info.user,
+                mail_subject="Reservation date update confirmation",
+                token_generator=default_token_generator,
+                template_name='reservation_update_confirmation.html',
+                to_email=reservation_owner_email,
+                extra_context=extra_context
+            )
+
+            return Response({
+                "detail": "Confirmation email sent to reservation owner.",
+                "reservation_id": reservation.id
+            }, status=status.HTTP_202_ACCEPTED)
+
+        return Response({"detail": "You do not have permission to modify this reservation."},
+                        status=status.HTTP_403_FORBIDDEN)
+
+
+class ReservationUpdateConfirmationView(APIView):
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('uidb64', str, OpenApiParameter.PATH),
+            OpenApiParameter('token', str, OpenApiParameter.PATH)
+        ],
+        responses={
+            200: OpenApiResponse(description="Reservation updated correctly"),
+            400: OpenApiResponse(description="Invalid token or validation error")
+        }
+    )
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_user_model().objects.get(pk=uid)
+        except Exception:
+            return Response({'detail': "Invalid link."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not default_token_generator.check_token(user, token):
+            return Response({"detail": 'Token invalid or expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        reservation_id = request.data.get("reservation_id")
+        if not reservation_id:
+            return Response({"detail": "Reservation ID not provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            reservation = Reservation.objects.get(id=reservation_id)
+        except Reservation.DoesNotExist:
+            return Response({"detail": "Reservation not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if not reservation.proposed_date_time:
+            return Response({"detail": "No pending update to confirm."}, status=status.HTTP_400_BAD_REQUEST)
+
+        reservation.date_time = reservation.proposed_date_time
+        reservation.proposed_date_time = None
+        reservation.save()
+
+        return Response({"detail": "Reservation updated correctly."}, status=status.HTTP_200_OK)

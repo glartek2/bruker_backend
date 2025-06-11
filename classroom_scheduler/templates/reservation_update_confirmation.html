@@ -1,0 +1,15 @@
+{% autoescape off %}
+
+{{ user.username }},
+
+User {{ requesting_user.username }} requested to change the reservation scheduled for {{ reservation.date_time }}
+(room: {{ reservation.room.room_number }}, building: {{ reservation.room.building.name }}).
+
+New proposed date and time: {{ new_date_time }}.
+
+Please click on the link below to confirm the reservation update:
+
+<a href="{{ protocol }}://{{ domain }}/reservation_update_confirmation/{{ uid }}/{{ token }}/?reservation_id={{ reservation.id }}">
+    Confirm reservation change
+</a>
+{% endautoescape %}

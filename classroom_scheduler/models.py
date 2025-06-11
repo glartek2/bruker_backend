@@ -32,18 +32,20 @@ class Room(models.Model):
 
 
 class ReservationInfo(models.Model):
-    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reservations')
+    class_representatives = models.ManyToManyField(CustomUser, related_name='represented_reservations')
     description = models.TextField()
 
     def __str__(self):
-        return f"Reservation for: {self.user_id}.\nDescription: {self.description}"
+        return f"Reservation for: {self.user}.\nDescription: {self.description}"
 
 
 class Reservation(models.Model):
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
-    reservation_info_id = models.ForeignKey(ReservationInfo, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    reservation_info = models.ForeignKey(ReservationInfo, on_delete=models.CASCADE)
 
     date_time = models.DateTimeField()
+    proposed_date_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"Reservation for room {self.room_id}, description: {self.reservation_info_id}, date: {self.date_time}"
+        return f"Reservation for room {self.room}, description: {self.reservation_info}, date: {self.date_time}"

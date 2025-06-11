@@ -14,17 +14,18 @@ from .serializers import RegisterSerializer, LoginSerializer, TokenResponseSeria
 from .tokens import account_activation_token
 
 
-def send_email(request, user, mail_subject, token_generator, template_name, to_email):
-    message = render_to_string(
-        template_name,
-        {
-            "user": user,
-            "domain": "localhost:5173",
-            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-            "token": token_generator.make_token(user),
-            "protocol": "https" if request.is_secure() else "http",
-        },
-    )
+def send_email(request, user, mail_subject, token_generator, template_name, to_email,extra_context=None):
+    context = {
+        "user": user,
+        "domain": "localhost:5173",
+        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "token": token_generator.make_token(user),
+        "protocol": "https" if request.is_secure() else "http",
+    }
+    if extra_context:
+        context.update(extra_context)
+
+    message = render_to_string(template_name, context)
 
     email = EmailMessage(mail_subject, message, to=[to_email])
     email.content_subtype = "html"

@@ -101,10 +101,14 @@ class ReservationInfoSerializer(serializers.ModelSerializer):
         source='user',
         write_only=True
     )
+    class_representatives = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        many=True
+    )
 
     class Meta:
         model = ReservationInfo
-        fields = ['id', 'user', 'user_id', 'description']
+        fields = ['id', 'user', 'user_id', 'class_representatives', 'description']
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -132,7 +136,8 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = [
             'id', 'room', 'room_id', 'reservation_info',
-            'reservation_info_id', 'reservation_info_data', 'date_time'
+            'reservation_info_id', 'reservation_info_data', 'date_time',
+            'proposed_date_time'
         ]
 
     def create(self, validated_data):
