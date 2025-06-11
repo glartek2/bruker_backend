@@ -10,10 +10,11 @@ router.register('equipment', views.EquipmentViewSet)
 router.register('rooms', views.RoomViewSet)
 router.register('reservation-info', views.ReservationInfoViewSet)
 router.register('reservation', views.ReservationViewSet)
+router.register("class_groups", views.ClassGroupViewSet)
 urlpatterns = [
     path('', views.home, name='home page'),
     path(
-        'reservation_update_confirmation/<uidb64>/<token>/',
+        'api/reservation_update_confirmation/<uidb64>/<token>/',
         views.ReservationUpdateConfirmationView.as_view(),
         name='reservation_update_confirmation'
     ),

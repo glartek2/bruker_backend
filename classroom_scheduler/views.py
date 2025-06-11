@@ -1,14 +1,16 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from .models import Building, Room, Equipment, Reservation, ReservationInfo
+from .models import Building, Room, Equipment, Reservation, ReservationInfo, ClassGroup
 from .serializers import BuildingSerializer, RoomSerializer, EquipmentSerializer, ReservationInfoSerializer, \
-    ReservationSerializer
+    ReservationSerializer, ClassGroupSerializer
 from .filters import DynamicJsonFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -103,13 +105,44 @@ class RoomViewSet(viewsets.ModelViewSet):
 
 
 class ReservationInfoViewSet(viewsets.ModelViewSet):
-    queryset = ReservationInfo.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = ReservationInfoSerializer
+    queryset = ReservationInfo.objects.none()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return ReservationInfo.objects.all()
+
+        return ReservationInfo.objects.filter(
+            Q(user=user) |
+            Q(group__class_representatives=user) |
+            Q(group__instructors=user)
+        ).distinct()
+
+
+class ClassGroupViewSet(viewsets.ModelViewSet):
+    serializer_class = ClassGroupSerializer
+    queryset = ClassGroup.objects.all()
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = ReservationSerializer
+    queryset = Reservation.objects.none()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return ReservationInfo.objects.all()
+
+        return ReservationInfo.objects.filter(
+            Q(user=user) |
+            Q(group__class_representatives=user) |
+            Q(group__instructors=user)
+        ).distinct()
 
     @extend_schema(
         request=ReservationSerializer,
@@ -128,17 +161,16 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         user = request.user
 
-        if user.is_staff:
-            serializer.save()
-            return Response({"detail": "Reservation updated successfully."}, status=status.HTTP_200_OK)
+        group = reservation.reservation_info.group
 
-        reservation_info = reservation.reservation_info
-
-        if reservation_info.class_representatives.filter(id=user.id).exists():
-            reservation_owner_email = reservation_info.user.email
+        if group and group.class_representatives.filter(id=user.id).exists():
             new_date_time = serializer.validated_data.get('date_time')
             reservation.proposed_date_time = new_date_time
             reservation.save()
+
+            instructor = group.instructors.first()
+            if not instructor:
+                return Response({"detail": "No instructor assigned to the group."}, status=400)
 
             extra_context = {
                 'requesting_user': user,
@@ -148,18 +180,22 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
             send_email(
                 request=request,
-                user=reservation_info.user,
+                user=instructor,
                 mail_subject="Reservation date update confirmation",
                 token_generator=default_token_generator,
                 template_name='reservation_update_confirmation.html',
-                to_email=reservation_owner_email,
+                to_email=instructor.email,
                 extra_context=extra_context
             )
 
             return Response({
-                "detail": "Confirmation email sent to reservation owner.",
+                "detail": "Confirmation email sent to reservation instructor.",
                 "reservation_id": reservation.id
             }, status=status.HTTP_202_ACCEPTED)
+
+        elif group and group.instructors.filter(id=user.id).exists():
+            serializer.save()
+            return Response({"detail": "Reservation updated successfully."}, status=status.HTTP_200_OK)
 
         return Response({"detail": "You do not have permission to modify this reservation."},
                         status=status.HTTP_403_FORBIDDEN)

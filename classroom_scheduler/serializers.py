@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Building, Equipment, Room, Reservation, ReservationInfo
+from .models import Building, Equipment, Room, Reservation, ReservationInfo, ClassGroup
 from users.serializers import CustomUserSerializer
 from users.models import CustomUser
 
@@ -94,6 +94,26 @@ class RoomSerializer(serializers.ModelSerializer):
         return room
 
 
+class ClassGroupSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        many=True
+    )
+    class_representatives = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        many=True
+    )
+    instructors = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(),
+        many=True,
+        required=False
+    )
+
+    class Meta:
+        model = ClassGroup
+        fields = ['id', 'name', 'members', 'class_representatives', 'instructors']
+
+
 class ReservationInfoSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
     user_id = serializers.PrimaryKeyRelatedField(
@@ -101,14 +121,16 @@ class ReservationInfoSerializer(serializers.ModelSerializer):
         source='user',
         write_only=True
     )
-    class_representatives = serializers.PrimaryKeyRelatedField(
-        queryset=CustomUser.objects.all(),
-        many=True
+    group = ClassGroupSerializer(read_only=True)
+    group_id = serializers.PrimaryKeyRelatedField(
+        queryset=ClassGroup.objects.all(),
+        source='group',
+        write_only=True
     )
 
     class Meta:
         model = ReservationInfo
-        fields = ['id', 'user', 'user_id', 'class_representatives', 'description']
+        fields = ['id', 'user', 'user_id', 'group', 'group_id', 'description']
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -125,7 +147,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         source='reservation_info',
         write_only=True
     )
-
     reservation_info_data = ReservationInfoSerializer(
         source='reservation_info',
         write_only=True,
@@ -136,26 +157,28 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = [
             'id', 'room', 'room_id', 'reservation_info',
-            'reservation_info_id', 'reservation_info_data', 'date_time',
-            'proposed_date_time'
+            'reservation_info_id', 'reservation_info_data',
+            'date_time', 'proposed_date_time'
         ]
 
     def create(self, validated_data):
-        reservation_info = validated_data.pop('reservation_info', None)
-        room_obj = validated_data.pop('room')
+        reservation_info_data = validated_data.pop('reservation_info', None)
+        room = validated_data.pop('room')
 
-        if isinstance(reservation_info, dict):
-            user_data = reservation_info.pop('user')
-            user_obj = CustomUser.objects.get(id=user_data['id'])
+        if isinstance(reservation_info_data, dict):
+            user_data = reservation_info_data.pop('user')
+            user = CustomUser.objects.get(id=user_data['id'])
+
             reservation_info, _ = ReservationInfo.objects.get_or_create(
-                user=user_obj,
-                defaults=reservation_info
+                user=user,
+                group=reservation_info_data.get('group'),
+                defaults=reservation_info_data
             )
+        else:
+            reservation_info = reservation_info_data
 
-        reservation = Reservation.objects.create(
-            room=room_obj,
+        return Reservation.objects.create(
+            room=room,
             reservation_info=reservation_info,
             **validated_data
         )
-
-        return reservation

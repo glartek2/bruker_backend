@@ -3,7 +3,6 @@ from django.db import models
 from users.models import CustomUser
 
 
-# Create your models here.
 class Building(models.Model):
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=255)
@@ -31,13 +30,23 @@ class Room(models.Model):
         return f"Room {self.room_number} in {self.building.name}"
 
 
+class ClassGroup(models.Model):
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(CustomUser, related_name='enrolled_classgroups')
+    class_representatives = models.ManyToManyField(CustomUser, related_name='class_representatives')
+    instructors = models.ManyToManyField(CustomUser, related_name='instructors', blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class ReservationInfo(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reservations')
-    class_representatives = models.ManyToManyField(CustomUser, related_name='represented_reservations')
+    group = models.ForeignKey(ClassGroup, on_delete=models.SET_NULL, null=True, blank=True, related_name='reservation_infos')
     description = models.TextField()
 
     def __str__(self):
-        return f"Reservation for: {self.user}.\nDescription: {self.description}"
+        return f"Reservation for: {self.user} (Group: {self.group}). Description: {self.description}"
 
 
 class Reservation(models.Model):
