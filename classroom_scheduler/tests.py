@@ -1,7 +1,13 @@
+from datetime import timedelta
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Building, Equipment, Room
+from django.utils import timezone
+
+from django.contrib.auth import get_user_model
+
+from users.models import CustomUser
+from .models import Building, ClassGroup, Equipment, Reservation, ReservationInfo, Room
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -144,3 +150,124 @@ class RoomAPITestCase(APITestCase):
         resp = self.client.delete(self.detail_url(self.room.pk))
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Room.objects.filter(pk=self.room.pk).exists())
+
+class ReservationTests(APITestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(username='student', password='pass')
+        self.group = ClassGroup.objects.create(name="Group A")
+        self.group.members.add(self.user)
+        self.group.class_representatives.add(self.user)
+
+        self.client.force_authenticate(self.user)
+
+        self.building = Building.objects.create(
+            name="Bldg1", address="Addr", department="Dept", description=""
+        )
+        self.equipment = Equipment.objects.create(details={'pc': 5})
+        self.room = Room.objects.create(
+            building=self.building,
+            equipment=self.equipment,
+            capacity=10,
+            room_number="100"
+        )
+
+        self.res_info = ReservationInfo.objects.create(
+            user=self.user,
+            group=self.group,
+            description="Desc1"
+        )
+
+        self.dt = timezone.now()
+        self.res = Reservation.objects.create(
+            room=self.room,
+            reservation_info=self.res_info,
+            date_time=self.dt
+        )
+
+        self.res2 = Reservation.objects.create(
+            room=self.room,
+            reservation_info = self.res_info,
+            date_time=self.dt + timedelta(days=5)
+        )
+
+        self.res3 = Reservation.objects.create(
+            room=self.room,
+            reservation_info=self.res_info,
+            date_time=self.dt + timedelta(days=10)
+        )
+
+        self.info_list = reverse('home_module:reservationinfo-list')
+        self.info_detail = lambda pk: reverse('home_module:reservationinfo-detail', args=[pk])
+        self.res_list = reverse('home_module:reservation-list')
+        self.res_detail = lambda pk: reverse('home_module:reservation-detail', args=[pk])
+
+    
+    def test_list_reservation_info(self):
+        resp = self.client.get(self.info_list)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(resp.data), 1)
+        self.assertEqual(resp.data[0]['description'], "Desc1")
+
+    def test_create_reservation_info(self):
+        payload = {
+            'user_id': self.user.id,
+            'group_id': self.group.id,
+            'description': 'New desc'
+        }
+        resp = self.client.post(self.info_list, payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(ReservationInfo.objects.filter(description='New desc').exists())
+
+    def test_update_reservation_info(self):
+        payload = {'description': 'Updated'}
+        resp = self.client.patch(self.info_detail(self.res_info.id), payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.res_info.refresh_from_db()
+        self.assertEqual(self.res_info.description, 'Updated')
+
+    def test_delete_reservation_info(self):
+        resp = self.client.delete(self.info_detail(self.res_info.id))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(ReservationInfo.objects.filter(pk=self.res_info.id).exists())
+
+    def test_list_reservations(self):
+        resp = self.client.get(self.res_list)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(resp.data), 1)
+        self.assertEqual(resp.data[0]['room']['room_number'], "100")
+    
+    def test_create_reservation(self):
+        before = Reservation.objects.count()
+        payload = {
+            'room_id': self.room.id,
+            'reservation_info_id': self.res_info.id,
+            'date_time': (timezone.now() + timedelta(days=2)).isoformat()
+        }
+        resp = self.client.post(self.res_list, payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Reservation.objects.count(), before + 1)
+
+    def test_retrieve_reservation(self):
+        resp = self.client.get(self.res_detail(self.res.id))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data['reservation_info']['description'], "Desc1")
+
+    def test_delete_reservation(self):
+        resp = self.client.delete(self.res_detail(self.res.id))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Reservation.objects.filter(pk=self.res.id).exists())
+
+    def test_filter_by_date_range(self):
+        start = self.dt.isoformat()
+        end = (self.dt + timedelta(days=6)).isoformat()
+
+        resp = self.client.get(self.res_list, {
+            'date_time__gte': start,
+            'date_time__lte': end
+        })
+
+        self.assertEqual(resp.status_code, 200)
+        returned_ids = {res['id'] for res in resp.data}
+        expected_ids = {self.res.id, self.res2.id}
+
+        self.assertEqual(returned_ids, expected_ids)

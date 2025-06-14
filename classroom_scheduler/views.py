@@ -131,17 +131,21 @@ class ReservationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReservationSerializer
     queryset = Reservation.objects.none()
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'date_time': ['gte', 'lte']
+    }
+    
     def get_queryset(self):
         user = self.request.user
 
         if user.is_staff:
-            return ReservationInfo.objects.all()
+            return Reservation.objects.all()
 
-        return ReservationInfo.objects.filter(
-            Q(user=user) |
-            Q(group__class_representatives=user) |
-            Q(group__instructors=user)
+        return Reservation.objects.filter(
+            Q(reservation_info__user=user) |
+            Q(reservation_info__group__class_representatives=user) |
+            Q(reservation_info__group__instructors=user)
         ).distinct()
 
     @extend_schema(
