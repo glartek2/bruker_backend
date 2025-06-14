@@ -131,7 +131,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ReservationSerializer
     queryset = Reservation.objects.none()
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'date_time': ['gte', 'lte']
+    }
+    
     def get_queryset(self):
         user = self.request.user
 

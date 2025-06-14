@@ -177,11 +177,23 @@ class ReservationTests(APITestCase):
             description="Desc1"
         )
 
-        self.dt = timezone.now() + timedelta(days=1)
+        self.dt = timezone.now()
         self.res = Reservation.objects.create(
             room=self.room,
             reservation_info=self.res_info,
             date_time=self.dt
+        )
+
+        self.res2 = Reservation.objects.create(
+            room=self.room,
+            reservation_info = self.res_info,
+            date_time=self.dt + timedelta(days=5)
+        )
+
+        self.res3 = Reservation.objects.create(
+            room=self.room,
+            reservation_info=self.res_info,
+            date_time=self.dt + timedelta(days=10)
         )
 
         self.info_list = reverse('home_module:reservationinfo-list')
@@ -225,6 +237,7 @@ class ReservationTests(APITestCase):
         self.assertEqual(resp.data[0]['room']['room_number'], "100")
     
     def test_create_reservation(self):
+        before = Reservation.objects.count()
         payload = {
             'room_id': self.room.id,
             'reservation_info_id': self.res_info.id,
@@ -232,8 +245,7 @@ class ReservationTests(APITestCase):
         }
         resp = self.client.post(self.res_list, payload, format='json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Reservation.objects.count(), 2)
-
+        self.assertEqual(Reservation.objects.count(), before + 1)
 
     def test_retrieve_reservation(self):
         resp = self.client.get(self.res_detail(self.res.id))
@@ -244,3 +256,18 @@ class ReservationTests(APITestCase):
         resp = self.client.delete(self.res_detail(self.res.id))
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Reservation.objects.filter(pk=self.res.id).exists())
+
+    def test_filter_by_date_range(self):
+        start = self.dt.isoformat()
+        end = (self.dt + timedelta(days=6)).isoformat()
+
+        resp = self.client.get(self.res_list, {
+            'date_time__gte': start,
+            'date_time__lte': end
+        })
+
+        self.assertEqual(resp.status_code, 200)
+        returned_ids = {res['id'] for res in resp.data}
+        expected_ids = {self.res.id, self.res2.id}
+
+        self.assertEqual(returned_ids, expected_ids)
