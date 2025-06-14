@@ -136,11 +136,18 @@ class ReservationInfoSerializer(serializers.ModelSerializer):
 class ReservationSerializer(serializers.ModelSerializer):
     room = RoomSerializer(read_only=True)
     reservation_info = ReservationInfoSerializer(read_only=True)
+    proposed_room = RoomSerializer(read_only=True)
 
     room_id = serializers.PrimaryKeyRelatedField(
         queryset=Room.objects.all(),
         source='room',
         write_only=True
+    )
+    proposed_room_id = serializers.PrimaryKeyRelatedField(
+        queryset=Room.objects.all(),
+        source='proposed_room',
+        write_only=True,
+        required=False
     )
     reservation_info_id = serializers.PrimaryKeyRelatedField(
         queryset=ReservationInfo.objects.all(),
@@ -157,8 +164,9 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
-            'id', 'room', 'room_id', 'reservation_info',
-            'reservation_info_id', 'reservation_info_data',
+            'id', 'room', 'room_id',
+            'proposed_room', 'proposed_room_id',
+            'reservation_info', 'reservation_info_id', 'reservation_info_data',
             'date_time', 'proposed_date_time'
         ]
 
@@ -172,21 +180,25 @@ class ReservationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         reservation_info_data = validated_data.pop('reservation_info', None)
         room = validated_data.pop('room')
+        proposed_room = validated_data.pop('proposed_room', None)
 
         if isinstance(reservation_info_data, dict):
-            user_data = reservation_info_data.pop('user')
-            user = CustomUser.objects.get(id=user_data['id'])
+            user = reservation_info_data.pop('user')
+            group = reservation_info_data.pop('group', None)
 
             reservation_info, _ = ReservationInfo.objects.get_or_create(
                 user=user,
-                group=reservation_info_data.get('group'),
+                group=group,
                 defaults=reservation_info_data
             )
         else:
             reservation_info = reservation_info_data
 
-        return Reservation.objects.create(
+        reservation = Reservation.objects.create(
             room=room,
+            proposed_room=proposed_room,
             reservation_info=reservation_info,
             **validated_data
         )
+
+        return reservation

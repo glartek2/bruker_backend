@@ -17,7 +17,7 @@ from .tokens import account_activation_token
 def send_email(request, user, mail_subject, token_generator, template_name, to_email,extra_context=None):
     context = {
         "user": user,
-        "domain": "localhost:5173",
+        "domain": "bruker-backend",
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": token_generator.make_token(user),
         "protocol": "https" if request.is_secure() else "http",

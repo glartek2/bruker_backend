@@ -2,14 +2,25 @@
 
 {{ user.username }},
 
-User {{ requesting_user.username }} requested to change the reservation scheduled for {{ reservation.date_time }}
-(room: {{ reservation.room.room_number }}, building: {{ reservation.room.building.name }}).
+User {{ requesting_user.username }} requested to change the reservation originally scheduled for:
 
-New proposed date and time: {{ new_date_time }}.
+- **Date & Time**: {{ reservation.date_time }}
+- **Room**: {{ reservation.room.room_number }}
+- **Building**: {{ reservation.room.building.name }}
 
-Please click on the link below to confirm the reservation update:
+**New proposed details:**
+{% if reservation.proposed_date_time %}
+- **New Date & Time**: {{ reservation.proposed_date_time }}
+{% endif %}
+{% if reservation.proposed_room %}
+- **New Room**: {{ reservation.proposed_room.room_number }}
+- **New Building**: {{ reservation.proposed_room.building.name }}
+{% endif %}
+
+Please click the link below to confirm the proposed changes:
 
 <a href="{{ protocol }}://{{ domain }}/reservation_update_confirmation/{{ uid }}/{{ token }}/?reservation_id={{ reservation.id }}">
     Confirm reservation change
 </a>
+
 {% endautoescape %}

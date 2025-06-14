@@ -169,7 +169,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         if group and group.class_representatives.filter(id=user.id).exists():
             new_date_time = serializer.validated_data.get('date_time')
+            new_proposed_room = serializer.validated_data.get('proposed_room')
+
             reservation.proposed_date_time = new_date_time
+            reservation.proposed_room = new_proposed_room
             reservation.save()
 
             instructor = group.instructors.first()
@@ -179,7 +182,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             extra_context = {
                 'requesting_user': user,
                 'reservation': reservation,
-                'new_date_time': new_date_time,
+
             }
 
             send_email(
@@ -240,6 +243,8 @@ class ReservationUpdateConfirmationView(APIView):
 
         reservation.date_time = reservation.proposed_date_time
         reservation.proposed_date_time = None
+        reservation.room = reservation.proposed_room
+        reservation.proposed_room = None
         reservation.save()
 
         return Response({"detail": "Reservation updated correctly."}, status=status.HTTP_200_OK)

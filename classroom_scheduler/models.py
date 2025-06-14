@@ -55,6 +55,7 @@ class Reservation(models.Model):
 
     date_time = models.DateTimeField()
     proposed_date_time = models.DateTimeField(null=True, blank=True)
+    proposed_room = models.ForeignKey(on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"Reservation for room {self.room}, description: {self.reservation_info}, date: {self.date_time}"
