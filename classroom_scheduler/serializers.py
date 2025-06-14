@@ -145,7 +145,8 @@ class ReservationSerializer(serializers.ModelSerializer):
     reservation_info_id = serializers.PrimaryKeyRelatedField(
         queryset=ReservationInfo.objects.all(),
         source='reservation_info',
-        write_only=True
+        write_only=True,
+        required=False
     )
     reservation_info_data = ReservationInfoSerializer(
         source='reservation_info',
@@ -160,6 +161,13 @@ class ReservationSerializer(serializers.ModelSerializer):
             'reservation_info_id', 'reservation_info_data',
             'date_time', 'proposed_date_time'
         ]
+
+    def validate(self, attrs):
+        if 'reservation_info' not in attrs or attrs['reservation_info'] is None:
+            raise serializers.ValidationError(
+                "Either reservation_info_id or reservation_info_data must be provided"
+            )
+        return attrs
 
     def create(self, validated_data):
         reservation_info_data = validated_data.pop('reservation_info', None)
