@@ -15,7 +15,7 @@ class DynamicJsonFilterBackend(BaseFilterBackend):
         reserved = {
             'page', 'page_size', 'pagination', 'ordering', 'search', 'id', 'room_number', 'capacity',
             'equipment__details', 'equipment__id', 'building__id', 'building__name', 'building__address',
-            'building__description',
+            'building__description', 'start', 'end',
         }
 
         for raw_key, raw_val in request.query_params.items():
