@@ -148,6 +148,21 @@ class ReservationViewSet(viewsets.ModelViewSet):
             Q(reservation_info__group__instructors=user)
         ).distinct()
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        room = serializer.validated_data.get('room')
+        date_time = serializer.validated_data.get('date_time')
+
+        if Reservation.objects.filter(room=room, date_time=date_time).exists():
+            return Response(
+                {"detail": "A reservation already exists for this room at the given time."},
+                status=status.HTTP_409_CONFLICT
+            )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     @extend_schema(
         request=ReservationSerializer,
         responses={

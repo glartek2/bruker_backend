@@ -177,6 +177,12 @@ class ReservationTests(APITestCase):
             description="Desc1"
         )
 
+        self.res_info2 = ReservationInfo.objects.create(
+            user=self.user,
+            group=self.group,
+            description="Desc2"
+        )
+
         self.dt = timezone.now()
         self.res = Reservation.objects.create(
             room=self.room,
@@ -205,8 +211,7 @@ class ReservationTests(APITestCase):
     def test_list_reservation_info(self):
         resp = self.client.get(self.info_list)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertGreaterEqual(len(resp.data), 1)
-        self.assertEqual(resp.data[0]['description'], "Desc1")
+        self.assertGreaterEqual(len(resp.data), 2)
 
     def test_create_reservation_info(self):
         payload = {
@@ -224,6 +229,26 @@ class ReservationTests(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.res_info.refresh_from_db()
         self.assertEqual(self.res_info.description, 'Updated')
+
+    def test_doubled_reservation(self):
+        before = Reservation.objects.count()
+        time = timezone.now().isoformat()
+        payload1 = {
+            'room_id': self.room.id,
+            'reservation_info_id': self.res_info.id,
+            'date_time': time,
+        }
+        payload2 = {
+            'room_id': self.room.id,
+            'reservation_info_id': self.res_info2.id,
+            'date_time': time,
+        }
+        resp1 = self.client.post(self.res_list, payload1, format='json')
+        resp2 = self.client.post(self.res_list, payload2, format='json')
+
+        self.assertEqual(resp1.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp2.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(Reservation.objects.count(), before + 1)
 
     def test_delete_reservation_info(self):
         resp = self.client.delete(self.info_detail(self.res_info.id))
