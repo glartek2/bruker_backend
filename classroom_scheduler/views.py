@@ -139,7 +139,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if user.is_staff:
+        me_param = self.request.query_params.get('me', '').lower()
+        force_user_filter = me_param in ['true', '1', 'yes', 'on']
+
+        if (user.is_staff or user.is_superuser) and not force_user_filter:
             return Reservation.objects.all()
 
         return Reservation.objects.filter(
