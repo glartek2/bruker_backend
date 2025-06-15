@@ -22,7 +22,7 @@ class Equipment(models.Model):
 
 class Room(models.Model):
     building = models.ForeignKey(Building, related_name='rooms', on_delete=models.CASCADE)
-    equipment = models.ForeignKey(Equipment, related_name='rooms', on_delete=models.SET_NULL, null=True, blank=True)
+    equipment = models.ForeignKey(Equipment, related_name='equipped_rooms', on_delete=models.SET_NULL, null=True, blank=True)
     capacity = models.PositiveIntegerField()
     room_number = models.CharField(max_length=50)
 
@@ -33,8 +33,8 @@ class Room(models.Model):
 class ClassGroup(models.Model):
     name = models.CharField(max_length=100)
     members = models.ManyToManyField(CustomUser, related_name='enrolled_classgroups')
-    class_representatives = models.ManyToManyField(CustomUser, related_name='class_representatives')
-    instructors = models.ManyToManyField(CustomUser, related_name='instructors', blank=True)
+    class_representatives = models.ManyToManyField(CustomUser, related_name='representative_of_groups')
+    instructors = models.ManyToManyField(CustomUser, related_name='instructed_groups', blank=True)
 
     def __str__(self):
         return self.name
@@ -50,12 +50,12 @@ class ReservationInfo(models.Model):
 
 
 class Reservation(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    reservation_info = models.ForeignKey(ReservationInfo, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='reservations')
+    reservation_info = models.ForeignKey(ReservationInfo, on_delete=models.CASCADE, related_name="reservations")
 
     date_time = models.DateTimeField()
     proposed_date_time = models.DateTimeField(null=True, blank=True)
-    proposed_room = models.ForeignKey(on_delete=models.CASCADE, null=True, blank=True)
+    proposed_room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="proposed_reservations", null=True)
 
     def __str__(self):
         return f"Reservation for room {self.room}, description: {self.reservation_info}, date: {self.date_time}"
