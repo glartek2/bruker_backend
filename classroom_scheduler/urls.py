@@ -14,7 +14,7 @@ router.register("class_groups", views.ClassGroupViewSet)
 urlpatterns = [
     path('', views.home, name='home page'),
     path(
-        'api/reservation_update_confirmation/<uidb64>/<token>/',
+        'api/reservation_update_confirmation/<uidb64>/<token>/<reservation_id>/',
         views.ReservationUpdateConfirmationView.as_view(),
         name='reservation_update_confirmation'
     ),
