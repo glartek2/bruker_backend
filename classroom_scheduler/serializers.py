@@ -184,12 +184,15 @@ class ReservationSerializer(serializers.ModelSerializer):
         proposed_room = validated_data.pop('proposed_room', None)
 
         if isinstance(reservation_info_data, dict):
-            user = reservation_info_data.pop('user')
-            group = reservation_info_data.pop('group', None)
-
+            lookup = {
+                'user': reservation_info_data.pop('user'),
+                'group': reservation_info_data.pop('group', None)
+            }
+            if 'description' in reservation_info_data:
+                lookup['description'] = reservation_info_data.pop('description')
+            
             reservation_info, _ = ReservationInfo.objects.get_or_create(
-                user=user,
-                group=group,
+                **lookup,
                 defaults=reservation_info_data
             )
         else:
@@ -250,12 +253,14 @@ class BulkReservationSerializer(serializers.Serializer):
         reservation_info_data = validated_data.pop('reservation_info', None)
 
         if isinstance(reservation_info_data, dict):
-            user = reservation_info_data.pop('user')
-            group = reservation_info_data.pop('group', None)
-
+            lookup = {
+                'user': reservation_info_data.pop('user'),
+                'group': reservation_info_data.pop('group', None)
+            }
+            if 'description' in reservation_info_data:
+                lookup['description'] = reservation_info_data.pop('description')
             reservation_info, _ = ReservationInfo.objects.get_or_create(
-                user=user,
-                group=group,
+                **lookup,
                 defaults=reservation_info_data
             )
         else:
