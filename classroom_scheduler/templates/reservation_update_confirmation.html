@@ -1,26 +1,42 @@
-{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation Change Request</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <p>Witaj {{ user.username }},</p>
 
-{{ user.username }},
+    <p>
+        Użytkownik <strong>{{ requesting_user.username }}</strong> poprosił o zmianę rezerwacji, która była pierwotnie zaplanowana na:
+    </p>
 
-User {{ requesting_user.username }} requested to change the reservation originally scheduled for:
+    <ul>
+        <li><strong>Data i godzina:</strong> {{ reservation.date_time }}</li>
+        <li><strong>Pokój:</strong> {{ reservation.room.room_number }}</li>
+        <li><strong>Budynek:</strong> {{ reservation.room.building.name }}</li>
+    </ul>
 
-- **Date & Time**: {{ reservation.date_time }}
-- **Room**: {{ reservation.room.room_number }}
-- **Building**: {{ reservation.room.building.name }}
+    <p><strong>Nowe proponowane szczegóły:</strong></p>
+    <ul>
+        {% if reservation.proposed_date_time %}
+        <li><strong>Nowa data i godzina:</strong> {{ reservation.proposed_date_time }}</li>
+        {% endif %}
+        {% if reservation.proposed_room %}
+        <li><strong>Nowy pokój:</strong> {{ reservation.proposed_room.room_number }}</li>
+        <li><strong>Nowy budynek:</strong> {{ reservation.proposed_room.building.name }}</li>
+        {% endif %}
+    </ul>
 
-**New proposed details:**
-{% if reservation.proposed_date_time %}
-- **New Date & Time**: {{ reservation.proposed_date_time }}
-{% endif %}
-{% if reservation.proposed_room %}
-- **New Room**: {{ reservation.proposed_room.room_number }}
-- **New Building**: {{ reservation.proposed_room.building.name }}
-{% endif %}
+    <p>Aby potwierdzić proponowane zmiany, kliknij poniższy link:</p>
 
-Please click the link below to confirm the proposed changes:
+    <p>
+        <a href="{{ protocol }}://{{ domain }}/reservation_update_confirmation/{{ uid }}/{{ token }}/?reservation_id={{ reservation.id }}"
+           style="display: inline-block; padding: 10px 20px; background-color: #2e6da4; color: #fff; text-decoration: none; border-radius: 4px;">
+            Potwierdź zmianę rezerwacji
+        </a>
+    </p>
 
-<a href="{{ protocol }}://{{ domain }}/reservation_update_confirmation/{{ uid }}/{{ token }}/?reservation_id={{ reservation.id }}">
-    Confirm reservation change
-</a>
-
-{% endautoescape %}
+    <p>Dziękujemy!</p>
+</body>
+</html>
