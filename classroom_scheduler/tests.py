@@ -154,7 +154,7 @@ class RoomAPITestCase(APITestCase):
 
 class ReservationTests(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(username='student', password='pass')
+        self.user = CustomUser.objects.create_user(username='student', password='pass', email="email@em.pl")
         self.group = ClassGroup.objects.create(name="Group A")
         self.group.members.add(self.user)
         self.group.class_representatives.add(self.user)
@@ -280,6 +280,21 @@ class ReservationTests(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Reservation.objects.count(), before + 1)
 
+    def test_create_reservation_nested(self):
+        before = Reservation.objects.count()
+        payload = {
+            'room_id': self.room.id,
+            'reservation_info_data': {
+                'user_id': self.user.id,
+                'group_id': self.group.id,
+                'description': "reservation_nested",
+            },
+            'date_time': (timezone.now() + timedelta(days=2)).isoformat()
+        }
+        resp = self.client.post(self.res_list, payload, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Reservation.objects.count(), before + 1) 
+
     def test_retrieve_reservation(self):
         resp = self.client.get(self.res_detail(self.res.id))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -306,12 +321,11 @@ class ReservationTests(APITestCase):
         self.assertEqual(returned_ids, expected_ids)
 
     def test_bulk_create_reservations(self):
-        info = ReservationInfo.objects.create(user=self.user)
         res_count = Reservation.objects.count() 
         now = timezone.now()
         payload = {
             "room_id": self.room2.id,
-            "reservation_info_id": info.id,
+            "reservation_info_id": self.group.id,
             "date_times": [
                 (now + timezone.timedelta(days=1)).isoformat(),
                 (now + timezone.timedelta(days=2)).isoformat(),
@@ -324,6 +338,28 @@ class ReservationTests(APITestCase):
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(Reservation.objects.count(), res_count + 3)
     
+    def test_bulk_create_reservations_nested(self):
+        res_count = Reservation.objects.count()
+        now = timezone.now()
+        payload = {
+            "room_id": self.room2.id,
+            "reservation_info_data": {
+                'user_id': self.user.pk,
+                'group_id': self.group.pk,
+                'description': "teststat",
+            },
+            "date_times": [
+                (now + timezone.timedelta(days=4)).isoformat(),
+                (now + timezone.timedelta(days=5)).isoformat(),
+                (now + timezone.timedelta(days=6)).isoformat(),
+            ]
+        }
+    
+        resp= self.client.post(reverse("home_module:reservation-bulk-create-reservation"), data=payload, format='json')
+
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(Reservation.objects.count(), res_count + 3)
+
     def test_bulk_create_reservations_failed(self):
         res_count = Reservation.objects.count() 
         now = timezone.now()
