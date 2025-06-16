@@ -210,6 +210,32 @@ class ReservationViewSet(viewsets.ModelViewSet):
         return Response({"detail": "You do not have permission to modify this reservation."},
                         status=status.HTTP_403_FORBIDDEN)
 
+    @extend_schema(
+        responses={
+            204: OpenApiResponse(description="Reservation deleted successfully."),
+            403: OpenApiResponse(description="You do not have permission to delete this reservation."),
+        },
+        description="Delete reservation. Only staff, superusers, and instructors of the group can delete."
+    )
+    def destroy(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        user = request.user
+
+        group = reservation.reservation_info.group
+
+        if user == reservation.reservation_info.user:
+            reservation.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if group and (group.class_representatives.filter(id=user.id).exists() or group.instructors.filter(id=user.id).exists()):
+            reservation.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(
+            {"detail": "You do not have permission to delete this reservation."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
 
 class ReservationUpdateConfirmationView(APIView):
     @extend_schema(
