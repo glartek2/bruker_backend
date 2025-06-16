@@ -1,5 +1,6 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.urls import reverse
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.utils import timezone
@@ -68,7 +69,7 @@ class RoomAPITestCase(APITestCase):
 
     def test_dynamic_json_filter(self):
         resp = self.client.get(self.list_url,
-                               {'computers__gte': 10, 'switches__gte': 5, 'programs__contains': 'windows'})
+                               {'computers__gte': 10, 'switches__gte': 5, 'programs__contains': 'windows, linux'})
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         details = [r['equipment']['details'] for r in resp.data]
@@ -340,5 +341,87 @@ class ReservationTests(APITestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(Reservation.objects.count(), res_count)
 
+class RoomAvailableAPITest(APITestCase):
+    def setUp(self):
+        # Setup user (wymagany do ReservationInfo)
+        self.user = CustomUser.objects.create_user(username='testuser', email='test@example.com', password='testpass')
 
+        # Optional group
+        self.group = ClassGroup.objects.create(name="Test Group")
+        self.group.members.add(self.user)
 
+        # Setup ReservationInfo
+        self.reservation_info = ReservationInfo.objects.create(
+            user=self.user,
+            group=self.group,
+            description="Test reservation"
+        )
+
+        # Setup building
+        self.building = Building.objects.create(
+            name="Engineering Hall",
+            address="123 Main St",
+            department="Engineering"
+        )
+
+        # Setup equipment with sufficient attributes
+        self.equipment_good = Equipment.objects.create(details={
+            "windows": 2,
+            "whiteboard": 3,
+            "projector": True
+        })
+
+        # Setup equipment that doesn't match filter
+        self.equipment_bad = Equipment.objects.create(details={
+            "windows": 0,
+            "whiteboard": 1
+        })
+
+        # Room that should match
+        self.room_matching = Room.objects.create(
+            building=self.building,
+            equipment=self.equipment_good,
+            capacity=35,
+            room_number="A101"
+        )
+
+        # Room that shouldn't match (bad equipment)
+        self.room_non_matching = Room.objects.create(
+            building=self.building,
+            equipment=self.equipment_bad,
+            capacity=40,
+            room_number="B202"
+        )
+
+        # Room that should be excluded due to reservation
+        self.reserved_room = Room.objects.create(
+            building=self.building,
+            equipment=self.equipment_good,
+            capacity=50,
+            room_number="C303"
+        )
+
+        self.overlapping_start = make_aware(datetime(2025, 6, 17, 6, 30))
+        Reservation.objects.create(
+            room=self.reserved_room,
+            date_time=self.overlapping_start,
+            reservation_info=self.reservation_info
+        )
+
+    def test_rooms_available_with_filters(self):
+        url = '/api/rooms/available/'
+        params = {
+            'start': '2025-06-17T06:00:00.000Z',
+            'end': '2025-06-17T07:30:00.000Z',
+            'capacity__gte': 30,
+            'windows__gte': 1,
+            'whiteboard__gte': 2
+        }
+
+        response = self.client.get(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        room_ids = [room['id'] for room in response.data]
+        self.assertIn(self.room_matching.id, room_ids)
+        self.assertNotIn(self.room_non_matching.id, room_ids)
+        self.assertNotIn(self.reserved_room.id, room_ids)

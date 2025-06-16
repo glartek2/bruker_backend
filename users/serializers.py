@@ -52,6 +52,9 @@ class LoginSerializer(serializers.Serializer):
 
 class TokenResponseSerializer(serializers.Serializer):
     token = serializers.CharField()
+    email = serializers.EmailField()
+    is_staff = serializers.BooleanField()
+    is_superuser = serializers.BooleanField()
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):

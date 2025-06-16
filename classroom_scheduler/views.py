@@ -139,7 +139,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if user.is_staff:
+        me_param = self.request.query_params.get('me', '').lower()
+        force_user_filter = me_param in ['true', '1', 'yes', 'on']
+
+        if (user.is_staff or user.is_superuser) and not force_user_filter:
             return Reservation.objects.all()
 
         return Reservation.objects.filter(
@@ -228,6 +231,32 @@ class ReservationViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": "Reservations created successfully."}, status=status.HTTP_201_CREATED)
+    
+    @extend_schema(
+        responses={
+            204: OpenApiResponse(description="Reservation deleted successfully."),
+            403: OpenApiResponse(description="You do not have permission to delete this reservation."),
+        },
+        description="Delete reservation. Only staff, superusers, and instructors of the group can delete."
+    )
+    def destroy(self, request, *args, **kwargs):
+        reservation = self.get_object()
+        user = request.user
+
+        group = reservation.reservation_info.group
+
+        if user == reservation.reservation_info.user:
+            reservation.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if group and (group.class_representatives.filter(id=user.id).exists() or group.instructors.filter(id=user.id).exists()):
+            reservation.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(
+            {"detail": "You do not have permission to delete this reservation."},
+            status=status.HTTP_403_FORBIDDEN
+        )
 
 
 class ReservationUpdateConfirmationView(APIView):
