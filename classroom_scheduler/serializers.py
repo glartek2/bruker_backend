@@ -1,3 +1,4 @@
+from typing import Counter
 from rest_framework import serializers
 from .models import Building, Equipment, Room, Reservation, ReservationInfo, ClassGroup
 from users.serializers import CustomUserSerializer
@@ -202,3 +203,67 @@ class ReservationSerializer(serializers.ModelSerializer):
         )
 
         return reservation
+
+class BulkReservationSerializer(serializers.Serializer):
+    room_id = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all())
+    reservation_info_id = serializers.PrimaryKeyRelatedField(
+        queryset=ReservationInfo.objects.all(),
+        source='reservation_info',
+        write_only=True,
+        required=False
+    )
+    reservation_info_data = ReservationInfoSerializer(
+        source='reservation_info',
+        write_only=True,
+        required=False
+    )
+    date_times = serializers.ListField(
+        child=serializers.DateTimeField(),
+        allow_empty=False
+    )
+
+    def validate(self, attrs):
+        if 'reservation_info' not in attrs or attrs['reservation_info'] is None:
+            raise serializers.ValidationError(
+                "Either reservation_info_id or reservation_info_data must be provided"
+            )
+        room = attrs['room_id']
+        date_times = attrs['date_times']
+        dt_counts = Counter(date_times)
+        duplicated = [dt for dt, count in dt_counts.items() if count > 1]
+        if duplicated:
+            raise serializers.ValidationError(
+                {"date_times": f"Duplicate date_times in input: {duplicated}"}
+            )
+
+        for dt in date_times:
+            if Reservation.objects.filter(room=room, date_time=dt).exists():
+                raise serializers.ValidationError(
+                    f"Room '{room}' is already booked for {dt}"
+                )
+
+        return attrs
+    
+    def create(self, validated_data):
+        room = validated_data['room_id']
+        date_times = validated_data['date_times']
+        reservation_info_data = validated_data.pop('reservation_info', None)
+
+        if isinstance(reservation_info_data, dict):
+            user = reservation_info_data.pop('user')
+            group = reservation_info_data.pop('group', None)
+
+            reservation_info, _ = ReservationInfo.objects.get_or_create(
+                user=user,
+                group=group,
+                defaults=reservation_info_data
+            )
+        else:
+            reservation_info = reservation_info_data
+
+        reservations = [
+            Reservation(room=room, reservation_info=reservation_info, date_time=dt)
+            for dt in date_times
+        ]
+
+        return Reservation.objects.bulk_create(reservations)
