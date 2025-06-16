@@ -172,10 +172,11 @@ class ReservationSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if 'reservation_info' not in attrs or attrs['reservation_info'] is None:
-            raise serializers.ValidationError(
-                "Either reservation_info_id or reservation_info_data must be provided"
-            )
+        if not self.instance:
+            if 'reservation_info' not in attrs or attrs['reservation_info'] is None:
+                raise serializers.ValidationError(
+                    "Either reservation_info_id or reservation_info_data must be provided"
+                )
         return attrs
 
     def create(self, validated_data):
@@ -207,6 +208,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         return reservation
 
+
 class BulkReservationSerializer(serializers.Serializer):
     room_id = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all())
     reservation_info_id = serializers.PrimaryKeyRelatedField(
@@ -232,7 +234,7 @@ class BulkReservationSerializer(serializers.Serializer):
             )
         room = attrs['room_id']
         date_times = attrs['date_times']
-        dt_counts = Counter(date_times)
+        dt_counts = Counter[date_times]
         duplicated = [dt for dt, count in dt_counts.items() if count > 1]
         if duplicated:
             raise serializers.ValidationError(

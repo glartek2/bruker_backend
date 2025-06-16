@@ -184,13 +184,13 @@ class ReservationViewSet(viewsets.ModelViewSet):
         user = request.user
 
         group = reservation.reservation_info.group
+        proposed_date_time = serializer.validated_data.get('proposed_date_time')
+        proposed_room = serializer.validated_data.get('proposed_room')
 
         if group and group.class_representatives.filter(id=user.id).exists():
-            new_date_time = serializer.validated_data.get('date_time')
-            new_proposed_room = serializer.validated_data.get('proposed_room')
 
-            reservation.proposed_date_time = new_date_time
-            reservation.proposed_room = new_proposed_room
+            reservation.proposed_date_time = proposed_date_time
+            reservation.proposed_room = proposed_room
             reservation.save()
 
             instructor = group.instructors.first()
@@ -219,7 +219,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_202_ACCEPTED)
 
         elif group and group.instructors.filter(id=user.id).exists():
-            serializer.save()
+            reservation.date_time = proposed_date_time
+            reservation.room = proposed_room
+            reservation.proposed_room = None
+            reservation.proposed_date_time = None
+            reservation.save()
             return Response({"detail": "Reservation updated successfully."}, status=status.HTTP_200_OK)
 
         return Response({"detail": "You do not have permission to modify this reservation."},
