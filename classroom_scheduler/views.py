@@ -268,14 +268,14 @@ class ReservationUpdateConfirmationView(APIView):
         parameters=[
             OpenApiParameter('uidb64', str, OpenApiParameter.PATH),
             OpenApiParameter('token', str, OpenApiParameter.PATH),
-            OpenApiParameter('reservation_id', str, OpenApiParameter.QUERY)
+            OpenApiParameter('reservation_id', str, OpenApiParameter.PATH)
         ],
         responses={
             200: OpenApiResponse(description="Reservation updated correctly"),
             400: OpenApiResponse(description="Invalid token or validation error")
         }
     )
-    def get(self, request, uidb64, token):
+    def get(self, request, uidb64, token, reservation_id):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = get_user_model().objects.get(pk=uid)
@@ -285,7 +285,6 @@ class ReservationUpdateConfirmationView(APIView):
         if not default_token_generator.check_token(user, token):
             return Response({"detail": 'Token invalid or expired.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        reservation_id = request.data.get("reservation_id")
         if not reservation_id:
             return Response({"detail": "Reservation ID not provided."}, status=status.HTTP_400_BAD_REQUEST)
 
