@@ -267,7 +267,8 @@ class ReservationUpdateConfirmationView(APIView):
     @extend_schema(
         parameters=[
             OpenApiParameter('uidb64', str, OpenApiParameter.PATH),
-            OpenApiParameter('token', str, OpenApiParameter.PATH)
+            OpenApiParameter('token', str, OpenApiParameter.PATH),
+            OpenApiParameter('reservation_id', str, OpenApiParameter.QUERY)
         ],
         responses={
             200: OpenApiResponse(description="Reservation updated correctly"),
