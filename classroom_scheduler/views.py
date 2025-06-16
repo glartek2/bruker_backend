@@ -274,7 +274,7 @@ class ReservationUpdateConfirmationView(APIView):
             400: OpenApiResponse(description="Invalid token or validation error")
         }
     )
-    def post(self, request, uidb64, token):
+    def get(self, request, uidb64, token):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = get_user_model().objects.get(pk=uid)
