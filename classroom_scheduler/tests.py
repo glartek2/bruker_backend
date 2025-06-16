@@ -170,6 +170,13 @@ class ReservationTests(APITestCase):
             capacity=10,
             room_number="100"
         )
+        
+        self.room2 = Room.objects.create(
+            building=self.building,
+            equipment=self.equipment,
+            capacity=15,
+            room_number="101"
+        )
 
         self.res_info = ReservationInfo.objects.create(
             user=self.user,
@@ -296,3 +303,42 @@ class ReservationTests(APITestCase):
         expected_ids = {self.res.id, self.res2.id}
 
         self.assertEqual(returned_ids, expected_ids)
+
+    def test_bulk_create_reservations(self):
+        info = ReservationInfo.objects.create(user=self.user)
+        res_count = Reservation.objects.count() 
+        now = timezone.now()
+        payload = {
+            "room_id": self.room2.id,
+            "reservation_info_id": info.id,
+            "date_times": [
+                (now + timezone.timedelta(days=1)).isoformat(),
+                (now + timezone.timedelta(days=2)).isoformat(),
+                (now + timezone.timedelta(days=3)).isoformat(),
+            ]
+        }
+    
+        resp= self.client.post(reverse("home_module:reservation-bulk-create-reservation"), data=payload, format='json')
+
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(Reservation.objects.count(), res_count + 3)
+    
+    def test_bulk_create_reservations_failed(self):
+        res_count = Reservation.objects.count() 
+        now = timezone.now()
+        payload = {
+            "room_id": self.room2.id,
+            "reservation_info_id": self.res_info.id,
+            "date_times": [
+                (now + timezone.timedelta(days=10)).isoformat(),
+                (now + timezone.timedelta(days=10)).isoformat(),
+                (now + timezone.timedelta(days=10)).isoformat(),
+            ]
+        }
+        resp= self.client.post(reverse("home_module:reservation-bulk-create-reservation"), data=payload, format='json')
+
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(Reservation.objects.count(), res_count)
+
+
+
