@@ -1,0 +1,51 @@
+[
+    {
+        "name": "INF",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+
+    {
+        "name": "AIPOC2025-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SCR2025-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "AIPOC2025-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SCR2025-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "FIZ2025-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "FIZ2025-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "FIZ2025-aud",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    }
+]
