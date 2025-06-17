@@ -1,0 +1,13 @@
+[
+    {
+        "building": "D17",
+        "capacity": 2137,
+        "room_number": 21.37,
+        "equipment_data": {
+            "details": {
+                "windows": 5,
+                "linux": 5
+            }
+        }
+    }
+]
