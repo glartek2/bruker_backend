@@ -13,5 +13,10 @@
         "name": "C3",
         "address": "al. Adama Mickiewicza 30",
         "department": "Wydział Elektrotechniki, Automatyki i Inżynierii Biomedycznej"
+    },
+    {
+        "name": "D2",
+        "address": "Reymonta 7a",
+        "department": "Wydział Elektrotechniki, Automatyki i Inżynierii Biomedycznej"
     }
 ]

@@ -89,6 +89,157 @@
         "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
         "room": 102,
         "proposed_room": 102
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Sieci komputerowe - Laboratoria"
+        },
+        "date_time": [
+            "2025-06-19T09:45:00Z",
+            "2025-06-26T09:45:00Z",
+            "2025-07-03T09:45:00Z",
+            "2025-07-10T09:45:00Z",
+            "2025-07-17T09:45:00Z"
+        ],
+        "room": 4.23,
+        "proposed_room": 4.23
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Systemy rozproszone - Laboratoria"
+        },
+        "date_time": [
+            "2025-06-18T13:15:00Z",
+            "2025-06-25T13:15:00Z",
+            "2025-07-02T13:15:00Z",
+            "2025-07-09T13:15:00Z",
+            "2025-07-16T13:15:00Z"
+        ],
+        "room": 4.23,
+        "proposed_room": 4.23
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Badania operacyjne - Laboratoria"
+        },
+        "date_time": [
+            "2025-06-17T18:30:00Z",
+            "2025-07-01T18:30:00Z",
+            "2025-07-15T18:30:00Z"
+        ],
+        "room": 1.11,
+        "proposed_room": 1.11
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Algorytmy trudne obliczeniowo - Laboratoria"
+        },
+        "date_time": [
+            "2025-06-17T11:30:00Z",
+            "2025-06-24T11:30:00Z",
+            "2025-07-01T11:30:00Z",
+            "2025-07-08T11:30:00Z",
+            "2025-07-15T11:30:00Z"
+        ],
+        "room": 4.27,
+        "proposed_room": 4.27
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Mikroprocesory - Laboratoria"
+        },
+        "date_time": [
+            "2025-06-17T15:00:00Z",
+            "2025-07-01T15:00:00Z",
+            "2025-07-15T15:00:00Z"
+        ],
+        "room": 3.23,
+        "proposed_room": 3.23
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Sieci komputerowe - Wykład"
+        },
+        "date_time": [
+            "2025-06-19T08:00:00Z",
+            "2025-06-26T08:00:00Z",
+            "2025-07-03T08:00:00Z",
+            "2025-07-10T08:00:00Z",
+            "2025-07-17T08:00:00Z"
+        ],
+        "room": 0,
+        "proposed_room": 0
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Systemy rozproszone - Wykład"
+        },
+        "date_time": [
+            "2025-06-18T08:00:00Z",
+            "2025-06-25T08:00:00Z",
+            "2025-07-02T08:00:00Z",
+            "2025-07-09T08:00:00Z",
+            "2025-07-16T08:00:00Z"
+        ],
+        "room": 0,
+        "proposed_room": 0
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Badania operacyjne - Wykład"
+        },
+        "date_time": [
+            "2025-06-17T08:00:00Z",
+            "2025-07-01T08:00:00Z",
+            "2025-07-15T08:00:00Z"
+        ],
+        "room": 0,
+        "proposed_room": 0
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Algorytmy trudne obliczeniowo - Wykład"
+        },
+        "date_time": [
+            "2025-06-17T08:00:00Z",
+            "2025-06-24T08:00:00Z",
+            "2025-07-01T08:00:00Z",
+            "2025-07-08T08:00:00Z",
+            "2025-07-15T08:00:00Z"
+        ],
+        "room": 0,
+        "proposed_room": 0
+    },
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "InfUser3",
+            "description": "Mikroprocesory - Wykład"
+        },
+        "date_time": [
+            "2025-06-17T09:45:00Z",
+            "2025-07-01T09:45:00Z",
+            "2025-07-15T09:45:00Z"
+        ],
+        "room": 0,
+        "proposed_room": 0
     }
-  
 ]
