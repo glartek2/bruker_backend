@@ -1,99 +1,70 @@
 [
     {
         "reservation_info": {
-            "group": "INF",
-            "user": "User1",
-            "description": "INF lab"
-        },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
-        "room": 21.37,
-        "proposed_room": 21.37
-    },
-    {
-        "reservation_info": {
             "group": "AIPOC2025-lab",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
         },
-        "date_time": ["2025-05-25T14:30:00+00:00", "2025-06-01T14:30:00+00:00", "2025-06-08T14:30:00+00:00", "2025-06-15T14:30:00+00:00", "2025-06-22T14:30:00+00:00", "2025-06-29T14:30:00+00:00", "2025-07-06T14:30:00+00:00"],
-        "room": 105,
-        "proposed_room": 105
-    },
-    {
-        "reservation_info": {
-            "group": "AIPOC2025-lab",
-            "user": "User1",
-            "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
-        },
-        "date_time":["2025-05-24T14:30:00+00:00", "2025-05-29T14:30:00+00:00", "2025-06-03T14:30:00+00:00", "2025-06-09T14:30:00+00:00", "2025-06-13T14:30:00+00:00", "2025-06-18T14:30:00+00:00", "2025-06-23T14:30:00+00:00", "2025-06-28T14:30:00+00:00", "2025-07-03T14:30:00+00:00"],
+        "date_time": ["2025-05-25T15:00:00+00:00", "2025-06-01T15:00:00+00:00", "2025-06-08T15:00:00+00:00", "2025-06-15T15:00:00+00:00", "2025-06-22T15:00:00+00:00", "2025-06-29T15:00:00+00:00", "2025-07-06T15:00:00+00:00"],
         "room": 105,
         "proposed_room": 105
     },
     {
         "reservation_info": {
             "group": "AIPOC2025-w",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
         },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "date_time":["2025-05-22T08:00:00+00:00", "2025-05-27T08:00:00+00:00", "2025-06-01T08:00:00+00:00", "2025-06-06T08:00:00+00:00", "2025-06-11T08:00:00+00:00", "2025-06-16T08:00:00+00:00", "2025-06-21T08:00:00+00:00", "2025-06-26T08:00:00+00:00", "2025-07-01T08:00:00+00:00"],
         "room": 405,
         "proposed_room": 405
     },
     {
         "reservation_info": {
             "group": "SCR2025-lab",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Systemy czasu rzeczywistego, zajęcia laboratoryjne"
         },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "date_time": ["2025-05-22T13:15:00+00:00", "2025-05-27T13:15:00+00:00", "2025-06-01T13:15:00+00:00", "2025-06-06T13:15:00+00:00", "2025-06-11T13:15:00+00:00", "2025-06-16T13:15:00+00:00", "2025-06-21T13:15:00+00:00", "2025-06-26T13:15:00+00:00", "2025-07-01T13:15:00+00:00"],
         "room": 210,
         "proposed_room": 210
     },
     {
         "reservation_info": {
             "group": "SCR2025-w",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Systemy czasu rzeczywistego, wykład"
 
         },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "date_time": ["2025-05-24T08:00:00+00:00", "2025-05-29T08:00:00+00:00", "2025-06-03T08:00:00+00:00", "2025-06-08T08:00:00+00:00", "2025-06-13T08:00:00+00:00", "2025-06-18T08:00:00+00:00", "2025-06-23T08:00:00+00:00", "2025-06-28T08:00:00+00:00", "2025-07-03T08:00:00+00:00"],
         "room": 405,
         "proposed_room": 405 
     },
     {
         "reservation_info": {
             "group": "FIZ2025-lab",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Fizyka, zajęcia laboratoryjne"
         },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "date_time":["2025-05-24T14:30:00+00:00", "2025-05-29T14:30:00+00:00", "2025-06-03T14:30:00+00:00", "2025-06-09T14:30:00+00:00", "2025-06-13T14:30:00+00:00", "2025-06-18T14:30:00+00:00", "2025-06-23T14:30:00+00:00", "2025-06-28T14:30:00+00:00", "2025-07-03T14:30:00+00:00"], 
         "room": 101,
         "proposed_room": 101 
     },
     {
         "reservation_info": {
             "group": "FIZ2025-w",
-            "user": "User1",
+            "user": "Prowadzacy",
             "description": "Fizyka, wykład"
         },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "date_time":["2025-05-24T09:45:00+00:00", "2025-05-29T09:45:00+00:00", "2025-06-03T09:45:00+00:00", "2025-06-08T09:45:00+00:00", "2025-06-13T09:45:00+00:00", "2025-06-18T09:45:00+00:00", "2025-06-23T09:45:00+00:00", "2025-06-28T09:45:00+00:00", "2025-07-03T09:45:00+00:00"],
         "room": 103,
         "proposed_room": 103
     },
-    {
-        "reservation_info": {
-            "group": "FIZ2025-aud",
-            "user": "User1",
-            "description": "Fizyka, zajęcia audytoryjne"
-        },
-        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
-        "room": 102,
-        "proposed_room": 102
-    },
+    
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Sieci komputerowe - Laboratoria"
         },
         "date_time": [
@@ -109,7 +80,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Systemy rozproszone - Laboratoria"
         },
         "date_time": [
@@ -125,7 +96,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Badania operacyjne - Laboratoria"
         },
         "date_time": [
@@ -139,7 +110,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Algorytmy trudne obliczeniowo - Laboratoria"
         },
         "date_time": [
@@ -155,7 +126,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Mikroprocesory - Laboratoria"
         },
         "date_time": [
@@ -169,7 +140,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Sieci komputerowe - Wykład"
         },
         "date_time": [
@@ -185,7 +156,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Systemy rozproszone - Wykład"
         },
         "date_time": [
@@ -201,13 +172,13 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Badania operacyjne - Wykład"
         },
         "date_time": [
-            "2025-06-17T08:00:00Z",
-            "2025-07-01T08:00:00Z",
-            "2025-07-15T08:00:00Z"
+            "2025-06-17T11:15:00Z",
+            "2025-07-01T11:15:00Z",
+            "2025-07-15T11:15:00Z"
         ],
         "room": 0,
         "proposed_room": 0
@@ -215,7 +186,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Algorytmy trudne obliczeniowo - Wykład"
         },
         "date_time": [
@@ -231,7 +202,7 @@
     {
         "reservation_info": {
             "group": "INF",
-            "user": "InfUser3",
+            "user": "Prowadzacy",
             "description": "Mikroprocesory - Wykład"
         },
         "date_time": [

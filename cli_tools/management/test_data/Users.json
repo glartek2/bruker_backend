@@ -1,8 +1,14 @@
 [
     {
-        "username": "User1",
-        "password": "User1.pas",
-        "email": "User1@mail.mail"
+        "username": "Prowadzacy",
+        "password": "Prowadzacy123",
+        "email": "prowadzacy@mail.mail"
+    },
+
+    {
+        "username": "Student",
+        "password": "Student123",
+        "email": "student@mail.mail"
     },
     {
         "username": "User2",

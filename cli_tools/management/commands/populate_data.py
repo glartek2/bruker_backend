@@ -13,7 +13,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         base_path = Path(__file__).resolve().parent.parent/ 'test_data'
-        print(base_path)
         with open(base_path / 'Users.json') as f:
             users = json.load(f)
             for user_data in users:
