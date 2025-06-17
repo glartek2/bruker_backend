@@ -1,0 +1,8 @@
+[
+    {
+        "name": "INF",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    }
+]

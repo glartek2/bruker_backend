@@ -1,0 +1,12 @@
+[
+    {
+        "reservation_info": {
+            "group": "INF",
+            "user": "User1",
+            "description": "INF lab"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 21.37,
+        "proposed_room": 21.37
+    }
+]
