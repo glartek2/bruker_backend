@@ -3,5 +3,15 @@
         "name": "D17",
         "address": "Kawiory 21",
         "department": "Wydział Informatyki"
+    },
+    {
+        "name": "D10",
+        "address": "Reymonta 19",
+        "department": "Wydział Fizyki i Informatyki Stosowanej AGH"
+    },
+    {
+        "name": "C3",
+        "address": "al. Adama Mickiewicza 30",
+        "department": "Wydział Elektrotechniki, Automatyki i Inżynierii Biomedycznej"
     }
 ]

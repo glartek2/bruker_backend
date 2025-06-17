@@ -4,5 +4,48 @@
         "members": ["User1", "User2"],
         "class_representatives": ["User1"],
         "instructors": ["User2"]
+    },
+
+    {
+        "name": "AIPOC2025-lab",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "SCR2025-lab",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "AIPOC2025-w",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "SCR2025-w",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "FIZ2025-lab",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "FIZ2025-w",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
+    },
+    {
+        "name": "FIZ2025-aud",
+        "members": ["User1", "User2"],
+        "class_representatives": ["User1"],
+        "instructors": ["User2"]
     }
 ]

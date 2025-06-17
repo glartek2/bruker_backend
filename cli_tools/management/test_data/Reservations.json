@@ -8,5 +8,87 @@
         "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
         "room": 21.37,
         "proposed_room": 21.37
+    },
+    {
+        "reservation_info": {
+            "group": "AIPOC2025-lab",
+            "user": "User1",
+            "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
+        },
+        "date_time": ["2025-05-25T14:30:00+00:00", "2025-06-01T14:30:00+00:00", "2025-06-08T14:30:00+00:00", "2025-06-15T14:30:00+00:00", "2025-06-22T14:30:00+00:00", "2025-06-29T14:30:00+00:00", "2025-07-06T14:30:00+00:00"],
+        "room": 105,
+        "proposed_room": 105
+    },
+    {
+        "reservation_info": {
+            "group": "AIPOC2025-lab",
+            "user": "User1",
+            "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
+        },
+        "date_time":["2025-05-24T14:30:00+00:00", "2025-05-29T14:30:00+00:00", "2025-06-03T14:30:00+00:00", "2025-06-09T14:30:00+00:00", "2025-06-13T14:30:00+00:00", "2025-06-18T14:30:00+00:00", "2025-06-23T14:30:00+00:00", "2025-06-28T14:30:00+00:00", "2025-07-03T14:30:00+00:00"],
+        "room": 105,
+        "proposed_room": 105
+    },
+    {
+        "reservation_info": {
+            "group": "AIPOC2025-w",
+            "user": "User1",
+            "description": "Analiza i przetwarzanie obrazów cyforywch, zajęcia laboratoryjne"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 405,
+        "proposed_room": 405
+    },
+    {
+        "reservation_info": {
+            "group": "SCR2025-lab",
+            "user": "User1",
+            "description": "Systemy czasu rzeczywistego, zajęcia laboratoryjne"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 210,
+        "proposed_room": 210
+    },
+    {
+        "reservation_info": {
+            "group": "SCR2025-w",
+            "user": "User1",
+            "description": "Systemy czasu rzeczywistego, wykład"
+
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 405,
+        "proposed_room": 405 
+    },
+    {
+        "reservation_info": {
+            "group": "FIZ2025-lab",
+            "user": "User1",
+            "description": "Fizyka, zajęcia laboratoryjne"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 101,
+        "proposed_room": 101 
+    },
+    {
+        "reservation_info": {
+            "group": "FIZ2025-w",
+            "user": "User1",
+            "description": "Fizyka, wykład"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 103,
+        "proposed_room": 103
+    },
+    {
+        "reservation_info": {
+            "group": "FIZ2025-aud",
+            "user": "User1",
+            "description": "Fizyka, zajęcia audytoryjne"
+        },
+        "date_time": ["2025-06-17T09:17:20.521Z", "2025-06-19T09:17:20.521Z"],
+        "room": 102,
+        "proposed_room": 102
     }
+  
 ]

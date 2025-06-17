@@ -17,6 +17,7 @@ class Command(BaseCommand):
         with open(base_path / 'Users.json') as f:
             users = json.load(f)
             for user_data in users:
+                print(user_data)
                 user, created = CustomUser.objects.get_or_create(**user_data)
                 self.stdout.write(self.style.SUCCESS(f"{'Created' if created else 'Skipped'} user: {user.username}"))
 
