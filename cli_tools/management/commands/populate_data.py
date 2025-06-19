@@ -18,7 +18,7 @@ class Command(BaseCommand):
         with open(base_path / 'Users.json') as f:
             users = json.load(f)
             for user_data in users:
-                if CustomUser.objects.filter(**user_data).exists():
+                if CustomUser.objects.filter(username=user_data['username'], email=user_data['email']).exists():
                     continue
                 user= CustomUser.objects.create_user(**user_data)
                 self.stdout.write(self.style.SUCCESS(f"{'Created'} user: {user.username}"))
