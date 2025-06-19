@@ -12,13 +12,16 @@ class Command(BaseCommand):
     help = 'Populate the database with test data from JSON files'
 
     def handle(self, *args, **kwargs):
+        if not CustomUser.objects.filter(username="admin").exists():
+            CustomUser.objects.create_superuser(username="admin", email="admin@mail.mail", password="admin123")
         base_path = Path(__file__).resolve().parent.parent/ 'test_data'
         with open(base_path / 'Users.json') as f:
             users = json.load(f)
             for user_data in users:
-                print(user_data)
-                user, created = CustomUser.objects.get_or_create(**user_data)
-                self.stdout.write(self.style.SUCCESS(f"{'Created' if created else 'Skipped'} user: {user.username}"))
+                if CustomUser.objects.filter(**user_data).exists():
+                    continue
+                user= CustomUser.objects.create_user(**user_data)
+                self.stdout.write(self.style.SUCCESS(f"{'Created'} user: {user.username}"))
 
         with open(base_path / 'Building.json') as f:
             buildings = json.load(f)
@@ -54,9 +57,9 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"{'Created' if created else 'Skipped'} class group: {group.name}"))
 
         with open(base_path / 'Reservations.json') as f:
-            user = CustomUser.objects.get(username='admin')
+            admin= CustomUser.objects.get(username='admin')
             client = APIClient()
-            client.force_authenticate(user=user)
+            client.force_authenticate(user=admin)
             reservations = json.load(f)
             for res_data in reservations:
                 res_info_data = res_data.pop('reservation_info')
