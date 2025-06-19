@@ -1,17 +1,6 @@
 [
     {
         "building": "D17",
-        "capacity": 2137,
-        "room_number": 21.37,
-        "equipment_data": {
-            "details": {
-                "windows": 5,
-                "linux": 5
-            }
-        }
-    },
-    {
-        "building": "D17",
         "capacity": 2000,
         "room_number": 0,
         "equipment_data": {

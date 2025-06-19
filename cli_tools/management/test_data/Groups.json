@@ -5,7 +5,6 @@
         "class_representatives": ["Student"],
         "instructors": ["Prowadzacy"]
     },
-
     {
         "name": "AIPOC2025-lab",
         "members": ["Student", "Prowadzacy"],
