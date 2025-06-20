@@ -46,5 +46,65 @@
         "members": ["Student", "Prowadzacy"],
         "class_representatives": ["Student"],
         "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SK-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SR-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "BO-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "APTO-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "TM-lab",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SK-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "SR-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "BO-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "APTO-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
+    },
+    {
+        "name": "TM-w",
+        "members": ["Student", "Prowadzacy"],
+        "class_representatives": ["Student"],
+        "instructors": ["Prowadzacy"]
     }
 ]
