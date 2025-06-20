@@ -234,7 +234,7 @@ class BulkReservationSerializer(serializers.Serializer):
             )
         room = attrs['room_id']
         date_times = attrs['date_times']
-        dt_counts = Counter[date_times]
+        dt_counts = Counter(date_times)
         duplicated = [dt for dt, count in dt_counts.items() if count > 1]
         if duplicated:
             raise serializers.ValidationError(

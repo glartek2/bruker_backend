@@ -231,7 +231,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='bulk_create')
     def bulk_create_reservation(self, request):
-        serializer = BulkReservationSerializer(data=request.data)
+        data = request.data.copy()
+        if 'reservation_info_data' in data:
+            data['reservation_info_data']['user_id'] = request.user.id
+
+        serializer = BulkReservationSerializer(data=data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": "Reservations created successfully."}, status=status.HTTP_201_CREATED)

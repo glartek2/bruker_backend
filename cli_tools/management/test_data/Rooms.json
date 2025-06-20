@@ -1,0 +1,159 @@
+[
+    {
+        "building": "D17",
+        "capacity": 2000,
+        "room_number": 0,
+        "equipment_data": {
+            "details": {
+                "MSTeams": 1,
+                "Webex": 1
+            }
+        }
+    },
+        {
+        "building": "D17",
+        "capacity": 20,
+        "room_number": 4.23,
+        "equipment_data": {
+            "details": {
+                "windows": 20,
+                "linux": 20,
+                "python": 20,
+                "java": 20,
+                "c/cpp": 20,
+                "wireshark": 20,
+                "router": 8,
+                "switch:": 8,
+                "hub": 4,
+                "eternet": 100,
+                "rzutnik": 2,
+                "whiteboard": 1
+            }
+        }
+    },
+        {
+        "building": "D17",
+        "capacity": 20,
+        "room_number": 4.27,
+        "equipment_data": {
+            "details": {
+                "windows": 20,
+                "linux": 20,
+                "python": 20,
+                "java": 20,
+                "c/cpp": 20,
+                "rzutnik": 1,
+                "whiteboard": 1
+            }
+        }
+    },
+        {
+        "building": "D17",
+        "capacity": 12,
+        "room_number": 3.23,
+        "equipment_data": {
+            "details": {
+                "windows": 20,
+                "linux": 20,
+                "python": 20,
+                "java": 20,
+                "c/cpp": 20,
+                "mikroprocesor": 24,
+                "sonda": 5,
+                "rzutnik": 1,
+                "whiteboard": 1
+            }
+        }
+    },
+        {
+        "building": "D2",
+        "capacity": 15,
+        "room_number": 1.11,
+        "equipment_data": {
+            "details": {
+                "windows": 15,
+                "linux": 15,
+                "python": 15,
+                "java": 15,
+                "c/cpp": 15,
+                "woltomierz": 5,
+                "silnik": 5
+            }
+        }
+    },
+    {
+        "building": "D10",
+        "capacity": 30,
+        "room_number": 101,
+        "equipment_data": {
+            "details": {
+                "oscyloskop": 15,
+                "windows": 15,
+                "stoły": 15
+            }
+        }
+    },
+    {
+        "building": "D10",
+        "capacity": 30,
+        "room_number": 102,
+        "equipment_data": {
+            "details": {
+                "tablice": 2,
+                "projektor-hdmi": 1,
+                "projektor-vga": 1
+            }
+        }
+    },
+    {
+        "building": "D10",
+        "capacity": 80,
+        "room_number": 103,
+        "equipment_data": {
+            "details": {
+                "tablice": 2,
+                "projektor-hdmi": 1,
+                "projektor-vga": 1
+            }
+        }
+    },
+    {
+        "building": "C3",
+        "capacity": 15,
+        "room_number": 105,
+        "equipment_data": {
+            "details": {
+                "tablice": 2,
+                "projektor-hdmi": 1,
+                "projektor-vga": 1,
+                "linux": 15
+            }
+        }
+    },
+    {
+        "building": "C3",
+        "capacity": 30,
+        "room_number": 210,
+        "equipment_data": {
+            "details": {
+                "tablice": 2,
+                "projektor-hdmi": 1,
+                "projektor-vga": 1,
+                "linux": 30
+            }
+        }
+    },
+    {
+        "building": "C3",
+        "capacity": 80,
+        "room_number": 405,
+        "equipment_data": {
+            "details": {
+                "tablice": 2,
+                "projektor-hdmi": 1,
+                "projektor-vga": 1
+            }
+        }
+    }
+
+]
